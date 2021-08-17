@@ -1,3 +1,3 @@
 # go_example
 
-> some example go test
+> some example go test !
