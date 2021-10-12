@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	gproto "go-example/grpc/proto"
+	gproto "go-example/grpc/gtest/proto"
 	"net"
 
 	"google.golang.org/grpc"
