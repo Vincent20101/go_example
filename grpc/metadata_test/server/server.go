@@ -3,10 +3,11 @@ package main
 import (
 	"context"
 	"fmt"
-	"go-example/metadata_test/proto"
+	"go-example/grpc/metadata_test/proto"
+	"net"
+
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
-	"net"
 )
 
 type Server struct{}

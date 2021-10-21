@@ -3,7 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
-	"go-example/metadata_test/proto"
+	"go-example/grpc/metadata_test/proto"
+
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
