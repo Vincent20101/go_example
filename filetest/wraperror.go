@@ -37,6 +37,7 @@ func main() {
 	_, err := ReadCofig()
 	if err != nil {
 		fmt.Println(err)
+		fmt.Printf("stack error : %+v\n", err)
 		os.Exit(1)
 	}
 }
