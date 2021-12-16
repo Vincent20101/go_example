@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"go-example/stream_grpc/proto"
+	"go-example/grpc/stream_grpc/proto"
 	"google.golang.org/grpc"
 	"net"
 	"sync"

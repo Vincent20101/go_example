@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"go-example/stream_grpc/proto"
+	"go-example/grpc/stream_grpc/proto"
 	"sync"
 	"time"
 
