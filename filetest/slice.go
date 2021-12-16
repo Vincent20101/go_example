@@ -85,6 +85,7 @@ func main0302() {
 
 func Test2(slice []int) {
 	slice[0] = 1
+	slice[1] = 1324
 	slice = append(slice, 1, 2, 3, 4, 5)
 	fmt.Println(slice)
 
@@ -93,13 +94,13 @@ func Test2(slice []int) {
 	fmt.Printf("%p\n", &slice)
 }
 
-func main0303() {
+func main() {
 	slice := make([]int, 5, 20)
 	fmt.Printf("%p\n", &slice)
 
 	Test2(slice)
 
-	fmt.Println(slice)
+	fmt.Println("我想看看：", slice)
 	fmt.Printf("the len is %d and cap is %d \n", len(slice), cap(slice))
 	fmt.Printf("%p\n", &slice)
 

@@ -16,7 +16,7 @@ func bar() error {
 	return errors.WithMessage(foo(), "bar failed")
 }
 
-func main() {
+func main0101() {
 	err := bar()
 	if errors.Cause(err) == sql.ErrNoRows {
 		fmt.Printf("data not found, %v\n", err)
@@ -28,4 +28,10 @@ func main() {
 	if err != nil {
 		// unknown error
 	}
+}
+
+func main() {
+	err1 := errors.New("第一个错误")
+	err2 := errors.Wrap(err1, errors.New("第二个错误").Error())
+	fmt.Println(errors.Unwrap(err2))
 }
