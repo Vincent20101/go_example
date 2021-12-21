@@ -6,6 +6,7 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"fmt"
+	"net/url"
 )
 
 const (
@@ -27,5 +28,5 @@ func ComputeHmacSha256(message string, secret string) string {
 
 func main() {
 
-	fmt.Println(ComputeHmacSha256(message, secret))
+	fmt.Println(url.QueryEscape("www.baidu.com?a=1&b=1&" + ComputeHmacSha256(message, secret)))
 }
