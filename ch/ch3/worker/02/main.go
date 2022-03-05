@@ -20,14 +20,14 @@ func main() {
 	go recv(ch, done) // 因为采用循环 =》从通道中获取信息 =》 后面的done通道无法设置参数
 	<-done            // 就不能执行 =》就会影响到main
 
-	// time.Sleep(1e9)
+	//time.Sleep(1e9)
 }
 
 func send(start, end int, ch chan<- int) {
 	for i := start; i < end; i++ {
 		ch <- i
 	}
-	//close(ch)
+	close(ch)
 }
 
 func recv(in <-chan int, done chan<- bool) {
