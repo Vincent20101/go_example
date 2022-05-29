@@ -18,6 +18,7 @@ func (p Plant) String() string {
 }
 
 func main() {
+	fmt.Println(1<<7)
 	coffee := &Plant{Id: 27, Name: "Coffee"}
 	coffee.Origin = []string{"Ethiopia", "Brazil"}
 

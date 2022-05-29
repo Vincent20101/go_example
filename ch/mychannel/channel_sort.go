@@ -2,23 +2,22 @@ package main
 
 import (
 	"fmt"
-	"runtime"
-	"sync"
+	"time"
 )
 
 func main() {
-	runtime.GOMAXPROCS(1)
+	//runtime.GOMAXPROCS(1)
 
-	var wg sync.WaitGroup
-	wg.Add(10)
+	//var wg sync.WaitGroup
+	//wg.Add(10)
 	for i := 0; i < 10; i++ {
 		go func(i int) {
 			fmt.Println(i)
-			wg.Done()
+			//wg.Done()
 		}(i)
 	}
 
 	// 1.14之前加上该行打印从0开始，之后版本则不影响
-	//time.Sleep(time.Second)
-	wg.Wait()
+	time.Sleep(time.Second)
+	//wg.Wait()
 }
