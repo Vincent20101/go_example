@@ -8,6 +8,7 @@ package main
 // sync/atomic and unsafe
 import (
 	"fmt"
+	"reflect"
 	"sync/atomic"
 	"unsafe"
 )
@@ -51,6 +52,13 @@ func main() {
 
 	// Printed if value is stored
 	fmt.Println("Val Stored!")
+
+	type age *int
+	typeOf := reflect.TypeOf((*age)(nil))
+	value := reflect.New(typeOf)
+	fmt.Println(value.Elem().Interface())
+	fmt.Println(&typeOf)
+
 }
 
 
