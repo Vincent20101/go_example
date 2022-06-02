@@ -6,7 +6,7 @@ import (
 	"net"
 	"os"
 
-	"github.com/vincent20101/go_example/niao_bao/protocol"
+	"github.com/vincent20101/go-example/nian_bao/protocol"
 )
 
 func main() {

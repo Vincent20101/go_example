@@ -1,4 +1,4 @@
-module github.com/vincent20101/go_example
+module github.com/vincent20101/go-example
 
 go 1.16
 

@@ -7,7 +7,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/vincent20101/go_xample/niao_bao/protocol"
+	"github.com/vincent20101/go-example/nian_bao/protocol"
 )
 
 func sender(conn net.Conn) {
