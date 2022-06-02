@@ -3,7 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
-	gproto "go-example/grpc/proto"
+
+	gproto "github.com/vincent20101/go-example/grpc/gtest/proto"
 
 	"google.golang.org/grpc"
 )

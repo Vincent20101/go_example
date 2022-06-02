@@ -3,11 +3,12 @@ package main
 import (
 	"context"
 	"fmt"
-	"go-example/grpc/grpc_token_auth_test/proto"
+	"net"
+
+	"github.com/vincent20101/go-example/grpc/grpc_token_auth_test/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
-	"net"
 
 	"google.golang.org/grpc"
 )

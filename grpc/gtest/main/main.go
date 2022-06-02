@@ -3,7 +3,8 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	gproto "go-example/grpc/proto"
+
+	gproto "github.com/vincent20101/go-example/grpc/gtest/proto"
 
 	"github.com/golang/protobuf/proto"
 )
