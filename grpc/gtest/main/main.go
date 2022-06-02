@@ -21,4 +21,7 @@ func main() {
 	newReq := gproto.HelloRequest{}
 	proto.Unmarshal(s, &newReq)
 	fmt.Println(newReq.Name)
+	fmt.Println(req.ProtoReflect().Descriptor())
+	fmt.Println(req.ProtoReflect())
+	fmt.Println(gproto.File_grpc_proto_helloworld_proto)
 }
