@@ -3,9 +3,10 @@ package main
 
 import (
 	"fmt"
-	"go-example/niao_bao/protocol"
 	"net"
 	"os"
+
+	"github.com/vincent20101/go_example/niao_bao/protocol"
 )
 
 func main() {

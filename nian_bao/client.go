@@ -3,10 +3,11 @@ package main
 
 import (
 	"fmt"
-	"go-example/niao_bao/protocol"
 	"net"
 	"os"
 	"time"
+
+	"github.com/vincent20101/go_xample/niao_bao/protocol"
 )
 
 func sender(conn net.Conn) {
