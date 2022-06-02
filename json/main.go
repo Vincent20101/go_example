@@ -48,11 +48,13 @@ func main() {
 		case "friend1":
 			var f1 Friend1
 			mapstructure.Decode(m, &f1)
+			fmt.Printf("%+v\n",f1)
 			fmt.Println("friend1", f1)
 
 		case "friend2":
 			var f2 Friend2
 			mapstructure.Decode(m, &f2)
+			fmt.Printf("%+v\n",f2)
 			fmt.Println("friend2", f2)
 		}
 	}
