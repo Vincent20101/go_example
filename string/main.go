@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 	"unicode/utf8"
 	"unsafe"
 )
@@ -16,4 +17,10 @@ func main() {
 	s := utf8.RuneCountInString("Hello, 世界")
 	s1 := len("Hello, 世界")
 	fmt.Println(s, s1)
+
+	index := strings.Index("死神来了, 死神bye bye", ", ")
+	fmt.Println(len("死神来了死神"))
+	fmt.Println(index)
+	fmt.Println(strings.Index("asdfgh", "g"))
+
 }
