@@ -28,8 +28,8 @@ func main() {
 			fmt.Println(c1)
 		case msg2 := <-c2:
 			fmt.Println("received", msg2)
-		default:
-			fmt.Println("default")
+			//default:
+			//	fmt.Println("default")
 		}
 	}
 }

@@ -28,4 +28,7 @@ func main() {
 	timeStr += dateArray[2]
 	fmt.Println(timeStr)
 
+	ut := time.Now().UnixNano()
+	fmt.Println(ut, "-------", ut>>32)
+
 }

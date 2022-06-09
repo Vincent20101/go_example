@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"net/http"
 
 	gproto "github.com/vincent20101/go-example/grpc/gtest/proto"
 
@@ -22,5 +23,6 @@ func main() {
 		panic(err)
 	}
 	fmt.Println(r.Message)
+	http.StatusTemporaryRedirect
 
 }
