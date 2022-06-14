@@ -10,17 +10,20 @@ func main() {
 	//forrangetest()
 	//selecttest()
 
-	ch := make(chan int)
-	done := make(chan struct{})
-	go selectblock(ch, done)
-	go func() {
-		for {
-			fmt.Println(<-ch)
-		}
-	}()
+	//ch := make(chan int)
+	//done := make(chan struct{})
+	//go selectblock(ch, done)
+	//go func() {
+	//	for {
+	//		fmt.Println(<-ch)
+	//	}
+	//}()
+	//
+	////select {}
+	//<-done
 
-	//select {}
-	<-done
+	go func() { time.Sleep(10 * time.Second) }()
+	select {}
 }
 
 func selectblock(ch chan int, done chan struct{}) {

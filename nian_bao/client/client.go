@@ -3,15 +3,13 @@ package main
 
 import (
 	"fmt"
+	"github.com/vincent20101/go-example/nian_bao/protocol"
 	"net"
 	"os"
-	"time"
-
-	"github.com/vincent20101/go-example/nian_bao/protocol"
 )
 
 func sender(conn net.Conn) {
-	for i := 0; i < 1000; i++ {
+	for i := 0; i < 2; i++ {
 		words := "{\"Id\":1,\"Name\":\"golang\",\"Message\":\"message\"}"
 		conn.Write(protocol.Packet([]byte(words)))
 	}
@@ -35,7 +33,10 @@ func main() {
 	defer conn.Close()
 	fmt.Println("connect success")
 	go sender(conn)
-	for {
-		time.Sleep(1 * 1e9)
-	}
+	fmt.Println("df end")
+	//for {
+	//	//time.Sleep(1 * 1e9)
+	//	time.Sleep(1 * time.Second)
+	//}
+	select {}
 }
