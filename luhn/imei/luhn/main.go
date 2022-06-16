@@ -7,11 +7,13 @@ import (
 )
 
 func main() {
-	//bool, err :=Verify("49015420323751")
-	//fmt.Println(bool,err)
+	bool, err := Verify("49015420323751")
+	fmt.Println(bool, err)
 	//nl, err :=Generate("35576205279323")
-	nl, err :=Generate("26053179311383")
-	fmt.Println(nl,err)
+	nl, err := Generate("26053179311383")
+	fmt.Println(nl, err)
+	nll, err := Generate("49015420323751")
+	fmt.Println(nll, err)
 }
 
 // Verify verifies if the last digit is a valid luhn check digit
@@ -52,7 +54,6 @@ func Generate(n string) (nl string, err error) {
 	nl = n + strconv.FormatInt(int64((sum*9)%10), 10)
 	return
 }
-
 
 func calculateDigit(digit int) int {
 	digit = digit * 2
