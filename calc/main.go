@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bytes"
+	"encoding/binary"
 	"fmt"
 	"strconv"
 )
@@ -21,4 +23,35 @@ func main() {
 	p2, _ := strconv.ParseInt(b2, 8, 64) // 8进制转10进制
 	fmt.Printf("%v\n", p2)               //229
 
+	toBytes := IntToBytes(257)
+	fmt.Println(toBytes)
+	fmt.Println(BytesToInt(toBytes))
+
+	var v3 uint32
+	var b3 [4]byte
+	v3 = 257
+	b3[3] = uint8(v3)
+	b3[2] = uint8(v3 >> 8)
+	b3[1] = uint8(v3 >> 16)
+	b3[0] = uint8(v3 >> 24)
+	fmt.Println("b3:", b3)
+}
+
+//整形转换成字节
+func IntToBytes(n int) []byte {
+	x := int32(n)
+
+	bytesBuffer := bytes.NewBuffer([]byte{})
+	binary.Write(bytesBuffer, binary.BigEndian, x)
+	return bytesBuffer.Bytes()
+}
+
+//字节转换成整形
+func BytesToInt(b []byte) int {
+	bytesBuffer := bytes.NewBuffer(b)
+
+	var x int32
+	binary.Read(bytesBuffer, binary.BigEndian, &x)
+
+	return int(x)
 }

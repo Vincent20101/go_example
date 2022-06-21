@@ -1,5 +1,7 @@
 package main
 
+import "unicode/utf8"
+
 /**
  * 反转字符串
  * @param str string字符串
@@ -27,4 +29,13 @@ func reverse(str string) string {
 		tt = append(tt, rs[len-i-1])
 	}
 	return string(tt[0:])
+}
+func reverse2(s string) string {
+	ss := make([]rune, utf8.RuneCountInString(s))
+	i := len(ss)
+	for _, c := range s {
+		i--
+		ss[i] = c
+	}
+	return string(ss)
 }
