@@ -6,6 +6,7 @@ require (
 	github.com/da440dil/go-workgroup v0.1.0
 	github.com/davecgh/go-spew v1.1.1
 	github.com/golang/protobuf v1.5.2
+	github.com/gorilla/websocket v1.5.0
 	github.com/mitchellh/mapstructure v1.4.3
 	github.com/neilotoole/errgroup v0.1.6
 	github.com/pkg/errors v0.9.1
