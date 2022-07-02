@@ -4,6 +4,7 @@ package protocol
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
 )
 
 const (
@@ -14,7 +15,28 @@ const (
 
 //封包
 func Packet(message []byte) []byte {
-	return append(append([]byte(ConstHeader), IntToBytes(len(message))...), message...)
+	s := string(message)
+	fmt.Println(s)
+	fmt.Println(len(s))
+	fmt.Println(1 << 8)
+	fmt.Println((int(s[0]) << 8) | int(s[1]))
+	fmt.Println(string(s[0]))
+	fmt.Println(string(s[1]))
+	fmt.Println(string(s[2]))
+	fmt.Println(string(s[3]))
+	fmt.Println(string(s[4]))
+	fmt.Println(string(s[5]))
+	fmt.Println(string(s[6]))
+	fmt.Println(string(s[7]))
+	fmt.Println(string(s[8]))
+	fmt.Println(string(s[42]))
+	fmt.Println(string(s[43]))
+
+	toBytes := IntToBytes(len(message))
+	slice := []byte(ConstHeader)
+	i := append(slice, toBytes...)
+	i2 := append(i, message...)
+	return i2
 }
 
 //解包
@@ -28,10 +50,13 @@ func Unpack(buffer []byte, readerChannel chan []byte) []byte {
 		}
 		if string(buffer[i:i+ConstHeaderLength]) == ConstHeader {
 			messageLength := BytesToInt(buffer[i+ConstHeaderLength : i+ConstHeaderLength+ConstSaveDataLength])
-			if length < i+ConstHeaderLength+ConstSaveDataLength+messageLength {
+			i2 := i + ConstHeaderLength + ConstSaveDataLength + messageLength
+			if length < i2 {
 				break
 			}
 			data := buffer[i+ConstHeaderLength+ConstSaveDataLength : i+ConstHeaderLength+ConstSaveDataLength+messageLength]
+			t := i + ConstHeaderLength + ConstSaveDataLength + messageLength
+			fmt.Println(t)
 			readerChannel <- data
 
 			i += ConstHeaderLength + ConstSaveDataLength + messageLength - 1

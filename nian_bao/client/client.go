@@ -3,16 +3,18 @@ package main
 
 import (
 	"fmt"
-	"github.com/vincent20101/go-example/nian_bao/protocol"
 	"net"
 	"os"
+
+	"github.com/vincent20101/go-example/nian_bao/protocol"
 )
 
 func sender(conn net.Conn) {
-	for i := 0; i < 2; i++ {
+	for i := 0; i < 200; i++ {
 		words := "{\"Id\":1,\"Name\":\"golang\",\"Message\":\"message\"}"
 		conn.Write(protocol.Packet([]byte(words)))
 	}
+	fmt.Println()
 	fmt.Println("send over")
 }
 

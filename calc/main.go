@@ -55,3 +55,57 @@ func BytesToInt(b []byte) int {
 
 	return int(x)
 }
+
+// https://learnku.com/articles/61994
+//很多编程语言都封装了 pack ()，unpack () 函数，用于把各种变量转为二进制。比如 php,python，ruby，go 也有 binary 包来帮我们做转化
+//
+//1.binary.Write ()，把变量写入到 [] byte
+//
+//2.binary.Read (), 读取 [] byte 转为对应类型的变量
+//3. 需要了解位运算，与 |，左移 <<，右移>>
+//
+//比如封装了 [] byte 转 int16, int32 的函数
+/*
+以num = 300为例，计算机加载进去内存后，用两个字节保存 00000001 00101100(不同cup架构存放会不同，但是byte()会读取最低位的字节)
+1.byte(),会把uint16读取一个低字节，所以byte(300)返回00101100，也就是44 属于uint16的低位
+2.把uint16右移8位，得到00000000 00000001，再取一个低字节00000001,属于uint16的高位
+大端序，字节数组从0开始放高位到地位，所以b[0] = 1, b[1]= 44
+*/
+func MyPutUint16(b []byte, num uint16) {
+	_ = b[1]
+	b[1] = byte(num)
+	b[0] = byte(num >> 8)
+}
+func MyPutUint32(b []byte, num uint32) {
+	_ = b[3]
+	b[3] = byte(num)
+	b[2] = byte(num >> 8)
+	b[1] = byte(num >> 16)
+	b[0] = byte(num >> 24)
+}
+
+// 封转了 int16,int32 转 [] byte
+/*
+以b[1,44]为例子
+1.首先把每个字节的整数转uint16，表示用两个字节保存
+00000000 00000001 //b[0]
+00000000 00101100 //b[1]
+
+2. 因为是大端序，需要把高字结位b[0]移动到左边。
+00000001 00000000  //b[0]
+
+3.使用与运算|, b[0]|b[1]得到新的uint16
+00000001 00000000 b[0]
+00000000 00101100 b[1]
+00000001 00101100 uint16
+*/
+func MyUint16(b []byte) uint16 {
+	_ = b[1]
+	return uint16(b[1]) | uint16(b[0])<<8
+}
+
+//同理，可以得出uint32
+func MyUint32(b []byte) uint32 {
+	_ = b[3]
+	return uint32(b[0])<<24 | uint32(b[1])<<16 | uint32(b[2])<<8 | uint32(b[3])
+}

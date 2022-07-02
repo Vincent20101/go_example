@@ -14,7 +14,7 @@ func main() {
 	dstring, err := ImsiToTBCDstring("630015002000004")
 	fmt.Println(dstring, err)
 
-	fmt.Println(ToString(dstring))
+	fmt.Println(TBCDToString(dstring))
 	i2, _ := strconv.ParseInt("F4", 16, 0)
 	fmt.Println(i2)
 	i3, _ := strconv.ParseInt("54", 16, 10)
@@ -163,8 +163,8 @@ func TBCDToString(buf []byte) string {
 	}
 
 	for _, data := range buf {
-		str1 := strconv.Itoa(int(data & 0x0f))
-		str2 := strconv.Itoa(int((data & 0xf0) >> 4))
+		str1 := strconv.Itoa(int(data & 0x0f))        // 0x0f  -241   https://tool.lu/hexconvert/?t=1506303877199
+		str2 := strconv.Itoa(int((data & 0xf0) >> 4)) // 0xf0  -16    https://tool.lu/hexconvert/?t=1506303877199
 
 		if len(str2) == 1 {
 			Str = Str + str1 + str2

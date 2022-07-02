@@ -3,9 +3,18 @@ package main
 import (
 	"encoding/hex"
 	"fmt"
+	"strconv"
 )
 
 func main() {
+	fmt.Println(1 & 1)
+	fmt.Println(string([]byte{1, 2, 3, 4, 5}))
+
+	fmt.Println(strconv.FormatInt(65535, 2))
+	fmt.Println(strconv.ParseInt("1111111111111111", 2, 64))
+	fmt.Println(65535 << 8)
+	fmt.Println(string([]byte{1, 1, 1, 1, 1}))
+	//panic("aaa")
 	s := "测试数据"
 	s2 := hex.EncodeToString([]byte(s))
 	b, err := hex.DecodeString(s2)
@@ -21,18 +30,18 @@ func main() {
 	s3 := fmt.Sprintf("%x", b)
 	fmt.Println(s3)
 
-	//byteData := []byte(`测试数据`)
-	//
-	//// 将 byte 装换为 16进制的字符串
-	//hexStringData := hex.EncodeToString(byteData)
-	//// byte 转 16进制 的结果
-	//println(hexStringData)
-	//
-	///* ====== 分割线 ====== */
-	//
-	//// 将 16进制的字符串 转换 byte
-	//hexData, _ := hex.DecodeString(hexStringData)
-	//// 将 byte 转换 为字符串 输出结果
-	//println(string(hexData))
+	v := "31323334353637383132333435363031"
+	fmt.Println(len(v))
+	//base64.StdEncoding.EncodeToString()
+	//base64.URLEncoding.EncodeToString()
+
+	p, _ := strconv.ParseInt(v, 16, 64) // 2进制转10进制
+	fmt.Printf("%v\n", p)
+
+	ss := "myself test"
+	fmt.Printf("%#x\n", ss)
+	fmt.Printf("%#X\n", ss)
+
+	fmt.Printf("%x\n", 13)
 
 }
