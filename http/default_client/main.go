@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.TODO(), 3*time.Second)
 	defer cancel()
 	//go httpDirectGet()
 	go httpGetWithContext(ctx)
@@ -29,13 +29,18 @@ func httpDirectGet() {
 }
 
 func httpGetWithContext(ctx context.Context) {
-	ctx, cancel := context.WithTimeout(ctx, 1*time.Second)
-	defer cancel()
-	req, err := http.NewRequest("get", "http://localhost:8088", nil)
+	ctx, _ = context.WithTimeout(ctx, 11*time.Second)
+	//defer cancel()
+	req, err := http.NewRequest("get", "http://localhost:8000", nil)
 	if err != nil {
 		log.Fatal("无法生成请求：", err)
 	}
-	req = req.WithContext(ctx)
+	ctx = context.WithValue(ctx, "p", "q")
+	//req = req.WithContext(ctx)
+	fmt.Println(req.Context().Value("p"))
+	deadline, ok := req.Context().Deadline()
+	fmt.Println(deadline, "===", ok)
+	fmt.Println("ctx", ctx)
 	resp, err := http.DefaultClient.Do(req)
 	fmt.Println(resp)
 	fmt.Println(err)

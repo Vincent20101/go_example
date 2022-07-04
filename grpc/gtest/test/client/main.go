@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"net/http"
+	"time"
 
 	gproto "github.com/vincent20101/go-example/grpc/gtest/proto"
 
@@ -18,11 +18,12 @@ func main() {
 	defer conn.Close()
 
 	client := gproto.NewGreeterClient(conn)
-	r, err := client.SayHello(context.Background(), &gproto.HelloRequest{Name: "bobby"})
+	ctx, _ := context.WithTimeout(context.Background(), 3*time.Second)
+	r, err := client.SayHello(ctx, &gproto.HelloRequest{Name: "bobby"})
 	if err != nil {
 		panic(err)
 	}
 	fmt.Println(r.Message)
-	http.StatusTemporaryRedirect
+	//http.StatusTemporaryRedirect
 
 }
