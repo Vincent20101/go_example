@@ -14,7 +14,9 @@ func main() {
 	_ = tr.Event(context.Background(), "test2")
 	_ = tr.Event(context.Background(), "test3")
 	time.Sleep(3 * time.Second)
-	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(5*time.Second))
+	//ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(5*time.Second))
+	duration, _ := time.ParseDuration("5s")
+	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(duration))
 	defer cancel()
 	tr.Shutdown(ctx)
 	//_ = tr.Event(context.Background(), "test4") // close channel后再发 会painc
