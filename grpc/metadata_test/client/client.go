@@ -3,7 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
-	"go-example/grpc/metadata_test/proto"
+
+	"github.com/vincent20101/go-example/grpc/metadata_test/proto"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
@@ -24,8 +25,10 @@ func main() {
 		"name":    "bobby",
 		"pasword": "imooc",
 	})
-	ctx := metadata.NewOutgoingContext(context.Background(), md)
+	ctx1 := context.WithValue(context.Background(), "a", "b")
+	ctx := metadata.NewOutgoingContext(ctx1, md)
 	r, err := c.SayHello(ctx, &proto.HelloRequest{Name: "bobby"})
+	fmt.Println("a的值为：", ctx.Value("a"))
 	if err != nil {
 		panic(err)
 	}

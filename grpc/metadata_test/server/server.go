@@ -3,8 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
-	"go-example/grpc/metadata_test/proto"
 	"net"
+
+	"github.com/vincent20101/go-example/grpc/metadata_test/proto"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
@@ -15,6 +16,7 @@ type Server struct{}
 func (s *Server) SayHello(ctx context.Context, request *proto.HelloRequest) (*proto.HelloReply,
 	error) {
 
+	fmt.Println("a的值:", ctx.Value("a"))
 	md, ok := metadata.FromIncomingContext(ctx)
 	fmt.Println(md)
 	if !ok {

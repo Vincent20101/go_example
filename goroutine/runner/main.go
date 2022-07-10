@@ -24,14 +24,15 @@ func main() {
 		switch err {
 		case ErrTimeOut:
 			log.Println("Terminating due to timeout.")
-			os.Exit(1)
+			//os.Exit(1)
 		case ErrInterrupt:
 			log.Println("Terminating due to interrupt.")
-			os.Exit(2)
+			//os.Exit(2)
 		}
 	}
 	//return
 	log.Println("Process ended.")
+	time.Sleep(100 * time.Second)
 }
 
 //createTask 返回一个根据 id 休眠指定秒数的示例任务
