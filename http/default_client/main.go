@@ -15,11 +15,11 @@ func main() {
 	//go httpDirectGet()
 	go httpGetWithContext(ctx)
 	<-ctx.Done()
-	time.Sleep(1000e9)
+	//time.Sleep(1000e9)
 }
 
 func httpDirectGet() {
-	resp, err := http.Get("http://localhost:8088")
+	resp, err := http.Get("http://localhost:8083/moreJSON")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -37,13 +37,16 @@ func httpGetWithContext(ctx context.Context) {
 	}
 	ctx = context.WithValue(ctx, "p", "q")
 	//req = req.WithContext(ctx)
-	fmt.Println(req.Context().Value("p"))
-	deadline, ok := req.Context().Deadline()
-	fmt.Println(deadline, "===", ok)
-	fmt.Println("ctx", ctx)
+	req = req.WithContext(ctx)
+	fmt.Println("第一：", req.Context().Value("p"))
+	//deadline, ok := req.Context().Deadline()
+	//fmt.Println(deadline, "===", ok)
+	fmt.Println("ctx 第二：", ctx)
+	fmt.Println("req的值：", req)
+	fmt.Println("req的值：", req.Context())
 	resp, err := http.DefaultClient.Do(req)
-	fmt.Println(resp)
-	fmt.Println(err)
+	fmt.Println("resp====:", resp)
+	fmt.Println("err=======:", err)
 	if err != nil {
 		log.Println("无法发送请求：", err)
 		return
@@ -52,5 +55,5 @@ func httpGetWithContext(ctx context.Context) {
 	if err != nil {
 		log.Fatal("无法读取返回内容：", err)
 	}
-	fmt.Println(string(data))
+	fmt.Println("结果：", string(data))
 }
