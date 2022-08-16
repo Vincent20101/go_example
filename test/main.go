@@ -1,10 +1,33 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"sync/atomic"
+)
 
 func main() {
 	fmt.Println(LinearBuckets(0.0001, 2, 6))
 	fmt.Println(ExponentialBuckets(0.0001, 10, 6))
+	var i uint64
+	fmt.Println(atomic.AddUint64(&i, 1))
+	fmt.Println(atomic.AddUint64(&i, 1))
+
+	s := []string{"a", "b"}
+	for l := range s {
+		fmt.Println(l)
+	}
+	var a []string
+	fmt.Println(a)
+	a1 := append(a, "test")
+	fmt.Println(a1, a1[0])
+
+	a2, b, c, d, e := 1, 2, 3, 4, 5
+	s1 := []*int{&a2, &b, &c, &d, &e}
+	s1 = s1[:0]
+	fmt.Println(s1)
+
+	fmt.Println(0 & (0x800 | 0x400))
+
 }
 
 // LinearBuckets creates 'count' buckets, each 'width' wide, where the lowest

@@ -11,11 +11,11 @@ require (
 	github.com/neilotoole/errgroup v0.1.6
 	github.com/pkg/errors v0.9.1
 	go.uber.org/zap v1.21.0
-	golang.org/x/net v0.0.0-20211015210444-4f30a5c0130f // indirect
 	golang.org/x/sys v0.0.0-20220227234510-4e6760a101f9 // indirect
-	golang.org/x/text v0.3.7 // indirect
 	google.golang.org/grpc v1.41.0
-	google.golang.org/protobuf v1.26.0
+	google.golang.org/protobuf v1.27.1
+	k8s.io/apimachinery v0.24.3
+	k8s.io/client-go v0.24.3
 )
 
 //replace (
