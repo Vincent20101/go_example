@@ -40,7 +40,7 @@ func main() {
 	// 第五种
 	var build strings.Builder
 	build.WriteString(s1)
-	//build.Reset()
+	build.Reset()
 	build.WriteString(s2)
 	s36 := build.String()
 	fmt.Println(s36)

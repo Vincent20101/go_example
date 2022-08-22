@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"sync/atomic"
+	"time"
 )
 
 func main() {
@@ -27,6 +28,14 @@ func main() {
 	fmt.Println(s1)
 
 	fmt.Println(0 & (0x800 | 0x400))
+
+	var t time.Time
+	fmt.Println(&t)
+
+	bs := []byte{0, 0, 0, 7}
+	fmt.Println(string(bs))
+
+	fmt.Println(32 << (^uint(0) >> 63))
 
 }
 

@@ -62,6 +62,16 @@ func main() {
 
 	marshal, _ := json.Marshal([]byte{84, 0, 21, 50, 0, 0, 0, 240})
 	fmt.Println(string(marshal))
+
+	is, _ := strconv.ParseInt("07", 16, 10)
+	fmt.Println(is)
+
+	var slices []string
+	slices = make([]string, 10)
+	fmt.Println(slices[0])
+	for k, v := range slices {
+		fmt.Println(k, v)
+	}
 }
 
 func solve(str string) string {
