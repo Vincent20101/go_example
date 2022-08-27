@@ -11,12 +11,15 @@ func main() {
 	//time.AfterFunc(1*time.Second, func() {
 	//	cancelFunc()
 	//})
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	fmt.Println(context.Background().Done())
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
 	go func(ctx context.Context) {
 		fmt.Println("开始sleep")
 		time.Sleep(5 * time.Second)
 		select {
-		case <-ctx.Done():
+		case v, ok := <-ctx.Done():
+			fmt.Println(v, ok)
 			return
 		default:
 		}

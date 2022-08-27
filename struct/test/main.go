@@ -28,4 +28,17 @@ func main() {
 	}
 	o.name = "test2"
 	fmt.Println(o)
+	var a int
+	b := make(map[string]string, 10)
+	b["a"] = "b"
+	defer func() {}()
+	var f func()
+	//f = nil
+	//defer f()
+	fmt.Println(f)
+	if a == 0 {
+		if s, ok := b["a"]; ok && a != 0 {
+			fmt.Println(s)
+		}
+	}
 }
