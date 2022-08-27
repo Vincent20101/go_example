@@ -29,8 +29,10 @@ func main() {
 	//	Mask: net.IPv4Mask(),
 	//}
 	//fmt.Println(netIP)
-
-	cidr, ipNet, error := net.ParseCIDR("5:6:7:8::/64")
+	var cidr net.IP
+	var ipNet *net.IPNet
+	var error error
+	cidr, ipNet, error = net.ParseCIDR("5:6:7:8::/64")
 	if error != nil {
 		fmt.Println(error)
 		return

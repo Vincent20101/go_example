@@ -61,4 +61,11 @@ func main() {
 
 	fmt.Println(strings.Split("vzwaudit.mnc010.mcc310.gprs", ".")[0])
 
+	// format should be '^\d+(\.\d+)? (bps|Kbps|Mbps|Gbps|Tbps)$' such as: "100.00 kbps"
+	split := strings.Split("100.00 kbps", " ")
+	fmt.Println(split[0])
+
+	fmt.Println("  sdf sdfdsf  ")
+	fmt.Println(strings.TrimSpace("  sdf sdfdsf  "))
+
 }
