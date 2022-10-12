@@ -23,10 +23,10 @@ func (u User) Print() {
 
 func main() {
 	//reflectBaisc()
-	//reflectLoopStruct()
+	reflectLoopStruct()
 	//reflectChangeFiledValue()
 	//reflectDynamicCallMethod()
-	reflectStructTag()
+	//reflectStructTag()
 }
 
 // 反射的基本用法
@@ -46,6 +46,7 @@ func reflectBaisc() {
 	fmt.Println("==============")
 	// reflect.Value转成原始数据
 	u1 := v.Interface().(User)
+	fmt.Println(v.Interface())
 	fmt.Println(u1, reflect.TypeOf(u1))
 
 	fmt.Println("==============")

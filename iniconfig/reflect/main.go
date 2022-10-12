@@ -8,11 +8,11 @@ import (
 
 func main() {
 	type Student struct {
-		Age int `json:"age"`
+		Age  int    `json:"age"`
 		Name string `json:"name"`
-		Sex string `json:"sex"`
+		Sex  string `json:"sex"`
 	}
-	s:=reflect.TypeOf((*Student)(nil))
+	s := reflect.TypeOf((*Student)(nil))
 	fmt.Println(s)
 	fmt.Println(reflect.New(s))
 	fmt.Println(reflect.New(s).Interface())
@@ -20,11 +20,14 @@ func main() {
 	str := `{"age": 1,"name": "test","sex": "男"}`
 
 	i := reflect.New(s)
-	if err := json.Unmarshal([]byte(str), i.Interface()); err !=nil{
+	if err := json.Unmarshal([]byte(str), i.Interface()); err != nil {
 		fmt.Println(err)
 	}
 	fmt.Println(i.Elem().Interface())
-	fmt.Println("=======",i.Elem().Elem().Interface())
+	fmt.Println(i.Elem())
+	fmt.Println(i.Elem().Addr())
+	fmt.Println(i.Elem().Addr().Interface())
+	fmt.Println("=======", i.Elem().Elem().Interface())
 	i.Elem().Elem().FieldByName("Sex").SetString("女")
 	student := i.Elem().Interface().(*Student)
 	fmt.Println(student)

@@ -42,7 +42,13 @@ func main() {
 	bb[3] = byte(ti >> 24)
 	bb[4] = byte(ti >> 32)
 
-	fmt.Println([]byte(ti))
+	var is uint16
+	is = 300
+	fmt.Println(strconv.FormatInt(int64(is), 2))
+	fmt.Println(strconv.FormatInt(int64(is&0xf), 2))
+	fmt.Printf("%T\n", is&0xf)
+	fmt.Println(is & 0xf)
+	fmt.Println(is & 0x0f)
 
 	fmt.Println(bb)
 	fmt.Println(string(bb))
