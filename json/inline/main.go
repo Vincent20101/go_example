@@ -11,7 +11,7 @@ type Project struct {
 }
 
 type JiraHttpReqField struct {
-	Project     `json:",inline"`
+	Project
 	Summary     string `json:"summary"`
 	Description string `json:"description"`
 }
@@ -26,6 +26,7 @@ func main() {
 		Summary:     "Summary",
 		Description: "Description",
 	}
+	fmt.Println(dataJiraHttpReqField.Value)
 	data, _ := json.Marshal(dataJiraHttpReqField)
 	fmt.Println(string(data))
 
