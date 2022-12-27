@@ -10,8 +10,11 @@ import (
 func main() {
 	// 创建一个监听8000端口的服务器
 	http.ListenAndServe(":8000", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println(r)
 		ctx := r.Context()
-		fmt.Println(ctx)
+		//ctx := context.Background()
+		//ctx, _ := context.WithTimeout(context.Background(), 7*time.Second)
+		fmt.Println("=====ctx:", ctx)
 		fmt.Println("=======", ctx.Value("p"))
 		deadline, ok := r.Context().Deadline()
 		fmt.Println(deadline, "===", ok)
