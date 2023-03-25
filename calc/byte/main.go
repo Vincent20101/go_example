@@ -8,6 +8,9 @@ import (
 )
 
 func main() {
+	fmt.Println(strconv.FormatInt(100, 2))
+	fmt.Println(strconv.FormatInt(10, 2))
+	fmt.Println(strconv.FormatInt((100^10)&10, 2))
 	var i uint64
 	i = 234234234234234234
 	formatBit := strconv.FormatInt(int64(i), 2)

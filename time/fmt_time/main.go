@@ -18,7 +18,7 @@ func main() {
 	//var timestamp time.Time
 	//itimeStr := fmt.Sprintf("%02d%02d%02d", timestamp.Hour(), timestamp.Minute(), timestamp.Second())
 	//fmt.Println(itimeStr)
-
+	fmt.Println(strconv.FormatInt(time.Now().UnixNano(), 16))
 	now := time.Now()
 	formatStr := "1504-0700"
 	fmt.Println(now.Format(formatStr))
@@ -278,7 +278,7 @@ func SbaBitRateRmToInt(rate string) (r *int64, err error) {
 	return
 }
 
-//整形转换成字节
+// 整形转换成字节
 func IntToBytes(val int64) ([]byte, error) {
 	bytesBuffer := bytes.NewBuffer([]byte{})
 	if err := binary.Write(bytesBuffer, binary.BigEndian, val); err != nil {
@@ -287,7 +287,7 @@ func IntToBytes(val int64) ([]byte, error) {
 	return bytesBuffer.Bytes(), nil
 }
 
-//字节转换成整形
+// 字节转换成整形
 func BytesToInt(b []byte) (int64, error) {
 	bytesBuffer := bytes.NewBuffer(b)
 	var iVal int64

@@ -17,7 +17,7 @@ import (
 type Server struct{}
 
 func (s *Server) SayHello(ctx context.Context, request *gproto.HelloRequest) (*gproto.HelloReply, error) {
-	time.Sleep(5 * time.Second)
+	//time.Sleep(5 * time.Second)
 	if ctx.Err() == context.Canceled {
 		return nil, status.Errorf(codes.Canceled, "SearchService.Search canceled")
 	}
@@ -30,12 +30,14 @@ func (s *Server) SayHello(ctx context.Context, request *gproto.HelloRequest) (*g
 	defer conn.Close()
 
 	client := gproto.NewGreeterClient(conn)
-	ctx1, _ := context.WithTimeout(ctx, 7*time.Second)
+	ctx1, _ := context.WithTimeout(ctx, 30*time.Second)
 	fmt.Println("进来了")
+	//time.Sleep(2 * time.Second)
 	r, err := client.SayHello(ctx1, &gproto.HelloRequest{Name: "bobby"})
 	if err != nil {
 		//panic(err)
 		fmt.Println(err)
+		fmt.Println("mistaken-------")
 		return &gproto.HelloReply{}, nil
 	}
 	fmt.Println(r.Message)

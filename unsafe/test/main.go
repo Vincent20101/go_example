@@ -5,9 +5,10 @@ import (
 	"unsafe"
 )
 
+// https://qcrao.com/post/dive-into-go-unsafe/
 func double(x *int) {
-	*x += *x
-	x = nil
+	*x += *x // x 跟 a 指向同一地址
+	x = nil  // x 指向另一个地址
 }
 
 func main() {
@@ -25,7 +26,6 @@ func main() {
 
 	count := **(**int)(unsafe.Pointer(&mp))
 	fmt.Println(count, len(mp)) // 2 2
-
 
 	s := make([]int, 9, 20)
 	var Len = *(*int)(unsafe.Pointer(uintptr(unsafe.Pointer(&s)) + uintptr(8)))

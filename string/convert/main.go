@@ -1,6 +1,9 @@
 package main
 
-import "unicode/utf8"
+import (
+	"fmt"
+	"unicode/utf8"
+)
 
 /**
  * 反转字符串
@@ -38,4 +41,36 @@ func reverse2(s string) string {
 		ss[i] = c
 	}
 	return string(ss)
+}
+
+func testReverseStringV2() {
+	var str = "hello中文 "
+	var r []rune = []rune(str)
+
+	for i := 0; i < len(r)/2; i++ {
+		tmp := r[len(r)-i-1]
+		r[len(r)-i-1] = r[i]
+		r[i] = tmp
+	}
+
+	str = string(r)
+	fmt.Println(str)
+}
+
+func testHuiWen() {
+	var str = "上海自来水来自海上"
+	var r []rune = []rune(str)
+
+	for i := 0; i < len(r)/2; i++ {
+		tmp := r[len(r)-i-1]
+		r[len(r)-i-1] = r[i]
+		r[i] = tmp
+	}
+
+	str2 := string(r)
+	if str2 == str {
+		fmt.Println(str, " is huiwen")
+	} else {
+		fmt.Println(str, " is not huiwen")
+	}
 }

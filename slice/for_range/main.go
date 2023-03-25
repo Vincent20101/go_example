@@ -18,14 +18,15 @@ func main() {
 		fmt.Println(v)
 	}
 	if s1 == nil {
-		if false {
+		if true {
 			goto cleanUp
 		}
-	cleanUp:
-		fmt.Println("clean up ing...")
-		fmt.Println("I am clean up xxxx")
 	}
 	fmt.Println("clean up done")
+cleanUp:
+	fmt.Println("clean up ing...")
+	fmt.Println("I am clean up xxxx")
+	//return
 
 	var s3 *string
 	fmt.Println(s3)

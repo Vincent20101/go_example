@@ -3,9 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
-	"go-example/grpc/stream_grpc/proto"
 	"sync"
 	"time"
+
+	gproto "github.com/vincent20101/go-example/grpc/stream_grpc/proto"
 
 	"google.golang.org/grpc"
 )

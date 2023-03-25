@@ -18,12 +18,14 @@ func main() {
 	defer conn.Close()
 
 	client := gproto.NewGreeterClient(conn)
-	ctx, _ := context.WithTimeout(context.Background(), 3*time.Second)
-	r, err := client.SayHello(ctx, &gproto.HelloRequest{Name: "bobby"})
+	ctx, _ := context.WithTimeout(context.Background(), 1*time.Second)
+	_, err = client.SayHello(ctx, &gproto.HelloRequest{Name: "bobby"})
 	if err != nil {
-		panic(err)
+		//panic(err)
+		fmt.Println(err)
 	}
-	fmt.Println(r.Message)
+	time.Sleep(100 * time.Second)
+	//fmt.Println(r.Message)
 	//http.StatusTemporaryRedirect
 
 }

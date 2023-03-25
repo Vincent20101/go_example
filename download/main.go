@@ -21,7 +21,7 @@ func ReadLines(fpath string) []string {
 	if err != nil {
 		//panic(err)
 		fmt.Println(err)
-		return
+		return nil
 	}
 	defer fd.Close()
 

@@ -14,8 +14,8 @@ import (
 type Server struct{}
 
 func (s *Server) SayHello(ctx context.Context, request *gproto.HelloRequest) (*gproto.HelloReply, error) {
-	time.Sleep(10 * time.Second)
 	fmt.Println("test22")
+	time.Sleep(4 * time.Second)
 	return &gproto.HelloReply{
 		Message: "Hello service2 " + request.Name,
 	}, nil

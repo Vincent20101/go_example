@@ -12,14 +12,16 @@ import (
 )
 
 func main() {
-	str := "1030::C9B4:FF12:48AA:1A2B"
+	//str := "1030::C9B4:FF12:48AA:1A2B"
+	str := "192.168.0.1"
 	ip := net.ParseIP(str)
+	fmt.Println(ip.String())
 	fmt.Println([]byte(ip))
-	fmt.Println(ip[8:].String())
-	toString := hex.EncodeToString(ip[8:])
-	fmt.Println(toString)
-	decodeString, _ := hex.DecodeString(toString)
-	fmt.Println(string(decodeString))
+	//fmt.Println(ip[8:].String())
+	//toString := hex.EncodeToString(ip[8:])
+	//fmt.Println(toString)
+	//decodeString, _ := hex.DecodeString(toString)
+	//fmt.Println(string(decodeString))
 	//fmt.Println(IP6toInt(ip))
 
 	//prefix := "2001:DB8::/64"
