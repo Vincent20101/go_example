@@ -6,6 +6,10 @@ import (
 	"net"
 	"time"
 
+	"google.golang.org/grpc/encoding"
+
+	"github.com/vincent20101/go-example/grpc/gtest/test/codec"
+
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -33,7 +37,7 @@ func (s *Server) SayHello(ctx context.Context, request *gproto.HelloRequest) (*g
 	ctx1, _ := context.WithTimeout(ctx, 30*time.Second)
 	fmt.Println("进来了")
 	//time.Sleep(2 * time.Second)
-	r, err := client.SayHello(ctx1, &gproto.HelloRequest{Name: "bobby"})
+	r, err := client.SayHello(ctx1, &gproto.HelloRequest{Name: "bobby"}, grpc.ForceCodec(&codec.JSONCoder{}))
 	if err != nil {
 		//panic(err)
 		fmt.Println(err)
@@ -47,6 +51,7 @@ func (s *Server) SayHello(ctx context.Context, request *gproto.HelloRequest) (*g
 }
 
 func main() {
+	encoding.RegisterCodec(&codec.JSONCoder{})
 	g := grpc.NewServer()
 	s := Server{}
 	gproto.RegisterGreeterServer(g, &s)
