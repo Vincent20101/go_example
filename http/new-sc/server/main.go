@@ -45,10 +45,12 @@ func main() {
 		}
 		sjosn, _ := json.Marshal(s)
 		select {
-		case <-time.After(7 * time.Second):
+		case <-time.After(1 * time.Second):
 			// 如果两秒后接受到了一个消息后，意味请求已经处理完成
 			// 我们写入"request processed"作为响应
 			fmt.Println("time.After=====")
+			time.Sleep(15 * time.Second)
+			fmt.Println("time.after.15")
 			//w.Write([]byte("request processed"))
 			w.Write(sjosn)
 		case <-ctx.Done():

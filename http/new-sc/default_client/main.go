@@ -61,7 +61,7 @@ func httpGetWithContext(ctx context.Context) {
 	ctx = context.WithValue(ctx, "p", "q")
 
 	// 只是配置了客户端的超时,并不能传递到服务端
-	//req = req.WithContext(ctx)
+	req = req.WithContext(ctx)
 
 	fmt.Println("第一：", req.Context().Value("p"))
 	fmt.Println("ctx 第二：", ctx)
