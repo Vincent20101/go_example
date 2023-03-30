@@ -43,6 +43,8 @@ func main() {
 	fmt.Println(cidr)
 	fmt.Println(ipNet.IP, len(ipNet.IP), ipNet.Mask, len(ipNet.Mask), ipNet.Mask[:])
 	fmt.Println(net.CIDRMask(12, 32).Size())
+	fmt.Println("lhb===", net.ParseIP("127.0.0.1:8088"))
+	fmt.Println(net.SplitHostPort("[::1]:33960"))
 
 }
 

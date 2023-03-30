@@ -12,8 +12,8 @@ func main() {
 	//	cancelFunc()
 	//})
 	fmt.Println(context.Background().Done())
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-	defer cancel()
+	ctx, _ := context.WithTimeout(context.Background(), 3*time.Second)
+	//defer cancel()
 	go func(ctx context.Context) {
 		fmt.Println("开始sleep")
 		time.Sleep(5 * time.Second)
@@ -23,6 +23,10 @@ func main() {
 			return
 		default:
 		}
+		//for {
+		//	fmt.Println("11")
+		//	time.Sleep(1 * time.Second)
+		//}
 		fmt.Println("结束了")
 	}(ctx)
 

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/http/httputil"
 	"os"
 	"time"
 )
@@ -16,44 +15,19 @@ type Student struct {
 func main() {
 	// 创建一个监听8000端口的服务器
 	http.ListenAndServe(":8000", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		//fmt.Println(spew.Sdump(r))
 		fmt.Println(r)
 		ctx := r.Context()
-		//ctx := context.Background()
-		//ctx, _ := context.WithTimeout(context.Background(), 7*time.Second)
 		fmt.Println("=====ctx:", ctx)
-		fmt.Println("=======", ctx.Value("p"))
 		deadline, ok := r.Context().Deadline()
 		fmt.Println(deadline, "===", ok)
 		// 输出到STDOUT展示处理已经开始
 		fmt.Fprint(os.Stdout, "processing request\n")
 
-		fmt.Println("=========")
+		//dump, errs := httputil.DumpRequest(r, true)
+		//fmt.Printf("\n%s, DumpRequest error:%v\n", string(dump), errs)
 
-		//// 获取请求报文的内容长度
-		//len := r.ContentLength
-		//// 新建一个字节切片，长度与请求报文的内容长度相同
-		//body := make([]byte, len)
-		//// 读取 r 的请求主体，并将具体内容读入 body 中
-		//r.Body.Read(body)
-		//// 将字节切片内容写入相应报文
-		//fmt.Println("body is: ", string(body), "\n")
-
-		//bodyRes, err := ioutil.ReadAll(r.Body)
-		//fmt.Println("ioutil.ReadAll", bodyRes, err)
-		//resbody := ioutil.NopCloser(bytes.NewReader(bodyRes))
-		////resbody := bytes.NewReader(bodyRes)
-		//fmt.Println("ioutil.NopCloser", resbody)
-		//bodyRes, err = ioutil.ReadAll(resbody)
-		//fmt.Println("ioutil.ReadAll", bodyRes, err)
-
-		//rc, err := httputil.DumpRequest(r, true)
-		//fmt.Println(err)
-		//fmt.Printf("Receive [Request: %v]\n", string(rc))
-
-		//fmt.Println("request: ", r.URL.Path)
-		dump, errs := httputil.DumpRequest(r, true)
-		fmt.Printf("\n%s, DumpRequest error:%v\n", string(dump), errs)
-
+		// 当body没有被读取时，客户端 ctx cancel，服务端 ctx 也不会 cancel
 		// 获取请求报文的内容长度
 		length := r.ContentLength
 		fmt.Println("length: ", length)
@@ -63,17 +37,15 @@ func main() {
 		r.Body.Read(body)
 		// 将字节切片内容写入相应报文
 		fmt.Println("body is: ", string(body), "\n")
-
-		fmt.Println("=========")
-
-		//time.Sleep(2 * time.Second)
+		defer r.Body.Close()
+		//fmt.Println("request: ", r.URL.Path)
 		// 通过select监听多个channel
 		s := Student{
 			Name: "lhb",
 		}
 		sjosn, _ := json.Marshal(s)
 		select {
-		case <-time.After(10 * time.Second):
+		case <-time.After(7 * time.Second):
 			// 如果两秒后接受到了一个消息后，意味请求已经处理完成
 			// 我们写入"request processed"作为响应
 			fmt.Println("time.After=====")
