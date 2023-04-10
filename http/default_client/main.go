@@ -102,6 +102,7 @@ func httpGetWithContext(ctx context.Context) {
 	// 读取 r 的请求主体，并将具体内容读入 body 中
 	resp.Body.Read(body)
 	fmt.Println("lhb==", body)
+
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Fatal("无法读取返回内容：", err)

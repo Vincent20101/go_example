@@ -40,7 +40,8 @@ func main() {
 	}
 
 	// 使用 clientsent 获取 Deployments
-	deployments, err := clientset.AppsV1().Deployments("casa").List(context.Background(), metav1.ListOptions{})
+	//deployments, err := clientset.AppsV1().Deployments("casa").List(context.Background(), metav1.ListOptions{})
+	deployments, err := clientset.CoreV1().Pods("casa").List(context.Background(), metav1.ListOptions{})
 	if err != nil {
 		panic(err)
 	}
