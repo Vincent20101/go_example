@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/vincent20101/go-example/grpc/grpc_token_auth_test/proto"
 	"google.golang.org/grpc"
@@ -36,20 +37,25 @@ func main() {
 	//	fmt.Printf("耗时：%s\n", time.Since(start))
 	//	return err
 	//}
-	grpc.WithPerRPCCredentials(customCredential{})
-	var opts []grpc.DialOption
-	opts = append(opts, grpc.WithInsecure())
-	opts = append(opts, grpc.WithPerRPCCredentials(customCredential{}))
-	conn, err := grpc.Dial("127.0.0.1:12345", opts...)
-	if err != nil {
-		panic(err)
-	}
-	defer conn.Close()
+	for i := 0; i < 5; i++ {
+		grpc.WithPerRPCCredentials(customCredential{})
+		var opts []grpc.DialOption
+		opts = append(opts, grpc.WithInsecure())
+		opts = append(opts, grpc.WithPerRPCCredentials(customCredential{}))
+		conn, err := grpc.Dial("127.0.0.1:12345", opts...)
+		fmt.Println("lianjie: ", conn)
+		if err != nil {
+			panic(err)
+		}
+		defer conn.Close()
 
-	c := proto.NewGreeterClient(conn)
-	r, err := c.SayHello(context.Background(), &proto.HelloRequest{Name: "linhuanbo1"})
-	if err != nil {
-		panic(err)
+		c := proto.NewGreeterClient(conn)
+		r, err := c.SayHello(context.Background(), &proto.HelloRequest{Name: "linhuanbo1"})
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println(r.Message)
+		time.Sleep(time.Second * 3)
 	}
-	fmt.Println(r.Message)
+
 }

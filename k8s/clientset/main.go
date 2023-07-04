@@ -49,7 +49,6 @@ func main() {
 	for idx, deploy := range deployments.Items {
 		fmt.Printf("%d -> %s\n", idx+1, deploy.Name)
 	}
-
 }
 
 func homeDir() string {

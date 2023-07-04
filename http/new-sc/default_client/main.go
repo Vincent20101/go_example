@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	ctx, cancel := context.WithTimeout(context.TODO(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
 	defer cancel()
 	//go httpDirectGet()
 	go httpGetWithContext(ctx)
@@ -36,7 +36,7 @@ type Student struct {
 }
 
 func httpGetWithContext(ctx context.Context) {
-	ctx, _ = context.WithTimeout(ctx, 3*time.Second)
+	ctx, _ = context.WithTimeout(ctx, 2*time.Second)
 	//ctx = context.Background()
 	//defer cancel()
 	stu := Student{
@@ -49,7 +49,7 @@ func httpGetWithContext(ctx context.Context) {
 	fmt.Println(string(stus))
 	fmt.Println(reader)
 	//reader := strings.NewReader(stus)
-	req, err := http.NewRequest(http.MethodPost, "http://localhost:8000", reader)
+	req, err := http.NewRequest(http.MethodPost, "http://localhost:8000", nil)
 	//dump, errs := httputil.DumpRequestOut(req, true)
 	//fmt.Printf("\n%s, DumpRequestOut error:%v\n", string(dump), errs)
 

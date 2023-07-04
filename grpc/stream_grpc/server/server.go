@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
-	"go-example/grpc/stream_grpc/proto"
-	"google.golang.org/grpc"
 	"net"
 	"sync"
 	"time"
+
+	gproto "github.com/vincent20101/go-example/grpc/stream_grpc/proto"
+	"google.golang.org/grpc"
 )
 
 const PORT = ":50052"

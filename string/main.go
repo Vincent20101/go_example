@@ -10,6 +10,9 @@ import (
 )
 
 func main() {
+	sst := "imsi-test"
+	sst = strings.TrimPrefix(sst, "imsi-")
+	fmt.Println(sst)
 	bytes := []byte{104, 101, 108, 108, 111}
 	fmt.Println(string(bytes))
 	p := unsafe.Pointer(&bytes) //强制转换成unsafe.Pointer，编译器不会报错

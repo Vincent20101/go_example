@@ -3,26 +3,30 @@ package main
 import (
 	"context"
 	"fmt"
-	"sync"
+	"time"
 )
 
 func main() {
-	var wg sync.WaitGroup
+	//var wg sync.WaitGroup
 	ch := make(chan *struct{})
-	wg.Add(1)
+	//wg.Add(1)
 	go func() {
-		ch <- nil
-		wg.Done()
+		time.Sleep(time.Second * 3)
+		//ch <- nil
+		close(ch)
+		//wg.Done()
 	}()
-	fmt.Println(<-ch)
-	wg.Wait()
+	//fmt.Println(<-ch)
+	//wg.Wait()
 	fmt.Println("end")
 	ctx := context.TODO()
 	select {
 	case <-ctx.Done():
 		fmt.Println("end======")
-	default:
-		fmt.Println("test")
+	case c, ok := <-ch:
+		fmt.Println(c, ok)
+		//default:
+		//	fmt.Println("test")
 
 	}
 }

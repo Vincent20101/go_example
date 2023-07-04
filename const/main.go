@@ -25,7 +25,18 @@ const (
 	g
 )
 
+var ts string
+
+func testGet() string {
+	return ts
+}
 func main() {
+
+	s12 := "sdfsdf"
+	fmt.Println(s12)
+
+	fmt.Println("lhb==", testGet())
+
 	fmt.Println(a, b, c, d, e, f, g)
 
 	switch a {

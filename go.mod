@@ -1,10 +1,11 @@
 module github.com/vincent20101/go-example
 
-go 1.20
+go 1.19
 
 require (
 	github.com/da440dil/go-workgroup v0.1.0
 	github.com/davecgh/go-spew v1.1.1
+	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/go-redis/redis/v8 v8.11.3
 	github.com/golang/protobuf v1.5.2
 	github.com/google/gopacket v1.1.19

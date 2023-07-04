@@ -55,6 +55,7 @@ func main() {
 	}
 
 	opt := grpc.UnaryInterceptor(interceptor)
+	grpc.MaxConcurrentStreams()
 	g := grpc.NewServer(opt)
 	proto.RegisterGreeterServer(g, &Server{})
 	lis, err := net.Listen("tcp", "0.0.0.0:12345")
