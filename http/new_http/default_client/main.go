@@ -8,11 +8,12 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/http/httputil"
 	"time"
 )
 
 func main() {
-	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.TODO(), 10*time.Second)
 	defer cancel()
 	//go httpDirectGet()
 	go httpGetWithContext(ctx)
@@ -36,7 +37,7 @@ type Student struct {
 }
 
 func httpGetWithContext(ctx context.Context) {
-	ctx, _ = context.WithTimeout(ctx, 2*time.Second)
+	ctx, _ = context.WithTimeout(ctx, 10*time.Second)
 	//ctx = context.Background()
 	//defer cancel()
 	stu := Student{
@@ -49,47 +50,58 @@ func httpGetWithContext(ctx context.Context) {
 	fmt.Println(string(stus))
 	fmt.Println(reader)
 	//reader := strings.NewReader(stus)
-	req, err := http.NewRequest(http.MethodPost, "http://localhost:8000", nil)
-	//dump, errs := httputil.DumpRequestOut(req, true)
-	//fmt.Printf("\n%s, DumpRequestOut error:%v\n", string(dump), errs)
+	fmt.Println("reader len: ==== :", reader.Len())
+	req, err := http.NewRequest(http.MethodPost, "http://localhost:8000", reader)
+	dump, errs := httputil.DumpRequestOut(req, true)
+	fmt.Printf("\n%s, DumpRequestOut error:%v\n", string(dump), errs)
 
+	getBody, errs := req.GetBody()
+	var bb []byte = make([]byte, req.ContentLength)
+	fmt.Println("getBody: ", getBody, errs)
+	getBody.Read(bb)
+	fmt.Println(string(bb))
+
+	fmt.Println("ssss==req==", req)
+	fmt.Println("ssss====", req.Context())
 	if err != nil {
 		log.Fatal("无法生成请求：", err)
 	}
 	//req.Header.Add("User-Agent", "cli")
 	req.Header.Set("Content-Type", "application/json")
 	ctx = context.WithValue(ctx, "p", "q")
-
-	// 只是配置了客户端的超时,并不能传递到服务端
+	//req = req.WithContext(ctx)
 	req = req.WithContext(ctx)
-
 	fmt.Println("第一：", req.Context().Value("p"))
+	//deadline, ok := req.Context().Deadline()
+	//fmt.Println(deadline, "===", ok)
 	fmt.Println("ctx 第二：", ctx)
 	fmt.Println("req的值：", req)
 	fmt.Println("req的值：", req.Context())
 
-	client := http.Client{}
-	resp, err := client.Do(req)
-	//resp, err := http.Post("http://localhost:8000/", "application/json", reader)
+	//resp, err := http.DefaultClient.Do(req)
+	resp, err := http.Post("http://localhost:8000/", "application/json", reader)
 	//resp, err := http.Get("http://localhost:8000/")
 	//io.Copy(ioutil.Discard, resp.Body)
-	select {
-	case <-ctx.Done():
-		fmt.Println("lhb context done")
-	}
+	defer func() {
+		e := resp.Body.Close()
+		fmt.Println("error: ", e)
+	}()
 	fmt.Println("resp====:", resp)
 	fmt.Println("err=======:", err)
-	defer func() {
-		if resp != nil {
-			e := resp.Body.Close()
-			fmt.Println("error: ", e)
-		}
-	}()
-
 	if err != nil {
 		log.Println("无法发送请求：", err)
 		return
 	}
+	//dump, errs = httputil.DumpResponse(resp, true)
+	//fmt.Printf("dump DumpResponse error:%v\n", dump)
+	//fmt.Printf("\n%s, DumpResponse error:%v\n", string(dump), errs)
+	// 获取请求报文的内容长度
+	length := resp.ContentLength
+	// 新建一个字节切片，长度与请求报文的内容长度相同
+	body := make([]byte, length)
+	// 读取 r 的请求主体，并将具体内容读入 body 中
+	resp.Body.Read(body)
+	fmt.Println("lhb==", body)
 
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
