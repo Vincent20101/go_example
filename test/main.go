@@ -2,18 +2,82 @@ package main
 
 import (
 	"fmt"
+	"math"
+	"net"
+	"strconv"
+	"strings"
 	"sync/atomic"
 	"time"
 )
 
 func main() {
+
+	var ip net.IP = []byte("nil")
+	fmt.Println(ip.To4().String() == "<nil>")
+	if strings.Contains("nil", "nil") {
+		fmt.Println("lhb")
+	}
+	type st struct {
+		name string
+		age  int
+		b    atomic.Bool
+	}
+	var stSlice = make([]map[int]*st, 0)
+	for i := 0; i < 10; i++ {
+		m := make(map[int]*st)
+		m[i] = &st{
+			name: strconv.Itoa(i),
+			age:  i,
+		}
+		m[i].b.Store(true)
+		fmt.Println("lhb:", m[i].b.Load())
+		stSlice = append(stSlice, m)
+	}
+	fmt.Println(stSlice)
+
+	for k, v := range stSlice {
+		if v != nil && k == 0 {
+			stSlice[k] = stSlice[len(stSlice)-1]
+			stSlice = stSlice[:len(stSlice)-1]
+		}
+	}
+
+	fmt.Println(stSlice)
+
+	fmt.Println(strconv.FormatBool(true))
+	fmt.Println(strconv.FormatBool(false))
+	fmt.Println(strings.Compare("false", "true"))
+
+	fmt.Println(time.Time{}.Unix())
+	smap := make(map[string]int)
+	if b, ok := smap["sdffff"]; !ok {
+		fmt.Println(b, ok)
+	}
+	fmt.Println(smap["sdf"])
+	smap["a"] = 5
+	smap = make(map[string]int)
+	fmt.Println(smap)
+	var slice1 []string
+	for i, s := range slice1 {
+		fmt.Println("range slice1", i, s)
+	}
+	fmt.Println(len(slice1))
+
+	var sss = "0"
+	atoi, err2 := strconv.Atoi(sss)
+	fmt.Println(atoi, err2)
+	fmt.Println("max:", math.MaxInt32)
+	fmt.Println("Nanosecond:", time.Now().Nanosecond())
+	fmt.Println("Nanosecond:", time.Now().UnixNano())
 	fmt.Println(LinearBuckets(0.0001, 2, 6))
 	fmt.Println(ExponentialBuckets(0.0001, 10, 6))
 	var i uint64
 	fmt.Println(atomic.AddUint64(&i, 1))
 	fmt.Println(atomic.AddUint64(&i, 1))
 
-	s := []string{"a", "b"}
+	s := []string{"a", "b", "c"}
+	fmt.Println("lhb===", s[:3])
+	fmt.Println("lhb===", len(s))
 	for l := range s {
 		fmt.Println(l)
 	}

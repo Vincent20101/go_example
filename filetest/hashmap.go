@@ -3,8 +3,12 @@ package main
 import (
 	"fmt"
 	"hash/crc32"
+	"runtime/debug"
 	"sort"
 	"sync"
+	"unsafe"
+
+	v2 "sigs.k8s.io/controller-tools/pkg/version"
 )
 
 type rindex []uint32 //hash环索引
@@ -15,17 +19,17 @@ type ring struct {
 	lock      *sync.RWMutex     //线程安全
 }
 
-//比大小
+// 比大小
 func (this rindex) Less(i, j int) bool {
 	return this[i] < this[j]
 }
 
-//长度
+// 长度
 func (this rindex) Len() int {
 	return len(this)
 }
 
-//交换
+// 交换
 func (this rindex) Swap(i, j int) {
 	this[i], this[j] = this[j], this[i]
 }
@@ -73,7 +77,21 @@ func (this *ring) Getnode(nodename string) string {
 	return node
 
 }
+
+var Version string
+
 func main() {
+
+	var b bool
+	fmt.Println(unsafe.Sizeof(b)) // 输出 1
+
+	info, ok := debug.ReadBuildInfo()
+	if !ok {
+		// binary has not been built with module support
+		fmt.Println("no ok")
+	}
+	v2.Print()
+	fmt.Println("lhb2", info.Main.Version)
 	filelist := []string{"123", "456", "789"}
 	hashmap := &ring{map[uint32]string{}, rindex{}, new(sync.RWMutex)}
 	fmt.Println(filelist, hashmap)

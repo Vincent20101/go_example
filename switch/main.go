@@ -1,11 +1,32 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 func main() {
-	through()
+	//through()
 	//swith()
-	delete(nil, 1)
+	//delete(nil, 1)
+	forSwitch()
+}
+
+func forSwitch() {
+	var doneCh chan struct{}
+	heartbeatCh := time.NewTicker(time.Second * 2)
+	for {
+		select {
+		case <-doneCh:
+			return
+		case <-heartbeatCh.C:
+			fmt.Println("heartbeats")
+			//return
+		default:
+			time.Sleep(time.Second)
+			fmt.Println("default sleep")
+		}
+	}
 }
 
 func through() {

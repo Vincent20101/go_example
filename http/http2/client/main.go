@@ -20,6 +20,9 @@ func main() {
 				//set connection timeout as 2 seconds
 				return net.DialTimeout(network, addr, time.Second*time.Duration(2))
 			},
+			//DialTLS: func(network, addr string, cfg *tls.Config) (net.Conn, error) {
+			//	return net.Dial(network, addr)
+			//},
 		},
 	}
 
@@ -40,6 +43,7 @@ func main() {
 	buf := make([]byte, 1024)
 	n, err := response.Body.Read(buf)
 	if err != nil {
+		fmt.Println("lhb")
 		log.Fatal(err)
 	}
 
