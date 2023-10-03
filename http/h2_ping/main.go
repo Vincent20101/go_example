@@ -12,7 +12,7 @@ import (
 
 func main() {
 	sendPing()
-	time.Sleep(time.Hour)
+	//time.Sleep(time.Hour)
 }
 
 func sendPing() {
@@ -21,7 +21,8 @@ func sendPing() {
 	//defer cancel()
 	//d := net.Dialer{}
 	//conn, err := d.DialContext(ctx, "tcp", "localhost:8082")
-	conn, err := net.DialTimeout("tcp", "localhost:8080", time.Second*10)
+	conn, err := net.DialTimeout("tcp", "localhost:8080", time.Second*3)
+	//conn, err := net.Dial("tcp", "localhost:8085")
 	if err != nil {
 		fmt.Println("Failed to connect:", err)
 		return
@@ -31,6 +32,7 @@ func sendPing() {
 	// 创建 http2.ClientConn
 	//cc := http2.ClientConn{}
 	transport := &http2.Transport{
+		//PingTimeout: 2,
 		AllowHTTP: true,
 		//DialTLS: func(network, addr string, cfg *tls.Config) (net.Conn, error) {
 		//	return net.Dial(network, addr)

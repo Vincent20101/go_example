@@ -7,7 +7,7 @@ import (
 
 func main() {
 	ticker := time.NewTicker(time.Second)
-	//defer ticker.Stop()
+	defer ticker.Stop()
 	done := make(chan bool)
 	go func() {
 		time.Sleep(10 * time.Second)
@@ -26,6 +26,7 @@ func main() {
 			//return
 		case t := <-ticker.C:
 			fmt.Println("Current time: ", t)
+			//time.Sleep(time.Second * 3)
 		}
 	}
 

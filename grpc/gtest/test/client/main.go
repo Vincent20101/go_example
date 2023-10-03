@@ -13,13 +13,15 @@ import (
 )
 
 func main() {
-	conn, err := grpc.Dial("127.0.0.1:8080", grpc.WithInsecure())
+	conn, err := grpc.Dial("127.0.0.1:8080", grpc.WithInsecure() /*, grpc.WithBlock()*/, grpc.MaxConcurrentStreams())
 	if err != nil {
 		panic(err)
 	}
 	defer conn.Close()
 
 	client := gproto.NewGreeterClient(conn)
+	fmt.Println("waiting for...")
+	time.Sleep(time.Second * 10)
 	ctx, _ := context.WithTimeout(context.Background(), 1*time.Second)
 	_, err = client.SayHello(ctx, &gproto.HelloRequest{Name: "bobby"}, grpc.ForceCodec(&codec.JSONCoder{}))
 	if err != nil {

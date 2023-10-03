@@ -11,6 +11,13 @@ import (
 )
 
 func main() {
+	var a11 int = 111
+	if true {
+		a11 := 222
+		fmt.Println(a11)
+	}
+	fmt.Println(a11)
+	fmt.Println(1<<0 | 1<<1)
 
 	var ip net.IP = []byte("nil")
 	fmt.Println(ip.To4().String() == "<nil>")

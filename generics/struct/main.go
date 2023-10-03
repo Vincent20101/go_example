@@ -67,14 +67,28 @@ type ChargingData struct {
 }
 
 func main() {
+	var s1 = make([]string, 0)
+	s1 = append(s1, "")
+	s1 = append(s1, "1")
+	fmt.Println(s1[:2])
+	fmt.Println(len(s1))
 	str := "sdfsdfsdfsdf\r\n" + "\\0\r\n" + "sdfsdfdsfsdfsdf\r\n"
 	fmt.Println(str)
 	var cd = ChargingData{}
 	cd.CdBitInstance.Set(CdBitMap_IS_REQ_FAIL)
 	cd.CdBitInstance.Set(CdBitMap_QBC)
 	cd.CdBitInstance.Set(CdBitMap_DEFER_CREATE_CHARGINGCtfTrigger)
+	fmt.Println("lhb:", cd.CdBitInstance)
+	t := CdBitMap_QBC
+	s := CdBitMap_DEFER_CREATE_CHARGINGCtfTrigger
+	Toggle(t, s)
+	fmt.Println("lhb:", t)
 	fmt.Println(cd.CdBitInstance.Get(CdBitMap_IS_REQ_FAIL))
 	cd.CdBitInstance.Clean(CdBitMap_DEFER_CREATE_CHARGINGCtfTrigger)
 	fmt.Println(spew.Sdump(cd))
 	fmt.Println(CdBitMap_IS_REQ_FAIL | CdBitMap_QBC)
+}
+
+func Toggle(t, s CdBitFlag) {
+	t ^= s
 }

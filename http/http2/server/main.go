@@ -3,11 +3,9 @@ package main
 import (
 	"crypto/tls"
 	"fmt"
+	"golang.org/x/net/http2/h2c"
 	"log"
 	"net/http"
-	"time"
-
-	"golang.org/x/net/http2/h2c"
 
 	"golang.org/x/net/http2"
 )
@@ -15,7 +13,7 @@ import (
 func main() {
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(r.Method)
-		time.Sleep(time.Second * 100)
+		//time.Sleep(time.Second * 100)
 		w.Header().Set("Content-Type", "text/plain")
 		w.Write([]byte("Hello, HTTP/2.0 h2c!"))
 		//fmt.Fprintf(w, "Hello, HTTP/2 Cleartext!")

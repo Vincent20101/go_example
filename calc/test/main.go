@@ -68,4 +68,6 @@ func main() {
 	fmt.Println("  sdf sdfdsf  ")
 	fmt.Println(strings.TrimSpace("  sdf sdfdsf  "))
 
+	sdf := 3242323423
+	fmt.Println(sdf % 10)
 }
