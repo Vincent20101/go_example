@@ -49,7 +49,8 @@ func radixSort(arr []int) []int {
 }
 
 func main() {
-	arr := []int{170, 45, 75, 90, 802, 24, 3, 2, 66}
+	arr := []int{11, 91, 222, 87348, 7123, 4213, 6232, 5123, 101111}
+	//arr := []int{170, 45, 75, 90, 802, 24, 3, 2, 66}
 	fmt.Println("原始数组：", arr)
 	sortedArr := radixSort(arr)
 	fmt.Println("排序后数组：", sortedArr)

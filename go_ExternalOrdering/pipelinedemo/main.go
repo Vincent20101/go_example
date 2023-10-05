@@ -1,17 +1,18 @@
 package main
 
-import(
-	"fmt"
-	"os"
-	"github.com/myproject/bingfa/pipeline"
+import (
 	"bufio"
-	)
+	"fmt"
+	"github.com/vincent20101/go-example/go_ExternalOrdering/pipeline"
+	"os"
+)
+
 /**
 func main(){
 	p := pipeline.ArraySource(3,2,6,7,4)
 	for{
 		// 错误写法 从chan p中取数据，
-		// num := <- p 
+		// num := <- p
 		// fmt.Println(num)
 
 		// if num,ok := <-p ; ok{
@@ -44,13 +45,13 @@ func main(){
 	}
 }**/
 
-func main(){
+func main() {
 	fmt.Println("start")
 	const n = 64
 	const filename = "small.in"
 	// 创建一个输入的文件
-	file , err := os.Create(filename)
-	if err != nil{
+	file, err := os.Create(filename)
+	if err != nil {
 		panic(err)
 	}
 
@@ -58,19 +59,19 @@ func main(){
 	p := pipeline.RandomSource(n)
 	// 写入文件
 	writer := bufio.NewWriter(file)
-	pipeline.WriterSink(writer,p)
+	pipeline.WriterSink(writer, p)
 	writer.Flush()
 
 	//  从文件中读取数据
-	file , err = os.Open(filename)
-	p = pipeline.ReaderSource(file,-1)
-	count := 0 
-	for v := range p{
+	file, err = os.Open(filename)
+	p = pipeline.ReaderSource(file, -1)
+	count := 0
+	for v := range p {
 		fmt.Println(v)
-		count++;
-		if count >= 100{
+		count++
+		if count >= 100 {
 			break
 		}
 	}
-	defer file.Close();
+	defer file.Close()
 }
