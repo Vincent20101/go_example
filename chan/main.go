@@ -7,6 +7,37 @@ import (
 
 func main() {
 
+	//test1()
+	stopCh := make(chan bool, 1)
+	go test2(stopCh)
+	time.Sleep(time.Second * 100)
+	fmt.Println("done")
+}
+
+func test2(stopCh chan bool) {
+	var i int
+
+	for {
+		select {
+		case <-stopCh:
+			fmt.Println("stop loop")
+			goto LOOP
+		default:
+			//do something
+			fmt.Println("doing something...")
+			time.Sleep(time.Second)
+			i++
+			if i == 5 {
+				stopCh <- true
+			}
+		}
+	}
+LOOP:
+	fmt.Println("111111111")
+	return
+}
+
+func test1() {
 	c1 := make(chan interface{})
 	c2 := make(chan interface{})
 

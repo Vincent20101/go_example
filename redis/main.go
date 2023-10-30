@@ -4,9 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"reflect"
+
 	"github.com/go-redis/redis/v8"
 	"github.com/vmihailenco/msgpack/v4"
-	"reflect"
 )
 
 var ctx = context.Background()
@@ -24,7 +25,7 @@ type TimerCache struct {
 
 func ExampleClient() {
 	rdb := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
+		Addr:     "172.0.3.64:6379",
 		Password: "", // no password set
 		DB:       0,  // use default DB
 	})

@@ -1,11 +1,10 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 
-	"github.com/mitchellh/mapstructure"
+	"github.com/vmihailenco/msgpack/v4"
 )
 
 type Person struct {
@@ -39,23 +38,24 @@ func main() {
 
 	for _, data := range datas {
 		var m map[string]interface{}
-		err := json.Unmarshal([]byte(data), &m)
+		fmt.Println(data)
+		err := msgpack.Unmarshal([]byte(data), &m)
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		switch m["type"].(string) {
-		case "friend1":
-			var f1 Friend1
-			mapstructure.Decode(m, &f1)
-			fmt.Printf("%+v\n",f1)
-			fmt.Println("friend1", f1)
-
-		case "friend2":
-			var f2 Friend2
-			mapstructure.Decode(m, &f2)
-			fmt.Printf("%+v\n",f2)
-			fmt.Println("friend2", f2)
-		}
+		//switch m["type"].(string) {
+		//case "friend1":
+		//	var f1 Friend1
+		//	mapstructure.Decode(m, &f1)
+		//	fmt.Printf("%+v\n",f1)
+		//	fmt.Println("friend1", f1)
+		//
+		//case "friend2":
+		//	var f2 Friend2
+		//	mapstructure.Decode(m, &f2)
+		//	fmt.Printf("%+v\n",f2)
+		//	fmt.Println("friend2", f2)
+		//}
 	}
 }

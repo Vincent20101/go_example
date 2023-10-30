@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>首页</title>
+        <script src='https://unpkg.com/vue@3'></script>
+        <style type="text/css">
+
+        </style>
+    </head>
+    <body>
+        <div id='hello-vue'>
+            {{ message }}
+        </div>
+        /**
+
+此课程提供者：微信imax882
+
++微信imax882
+办理会员 课程全部免费看
+
+课程清单：https://leaaiv.cn
+
+全网最全 最专业的 一手课程
+
+成立十周年 会员特惠 速来抢购
+
+**/
+
+        <script type="text/javascript">
+            const { ref } = Vue
+            const HelloVueApp = {
+                setup() {
+                    const message = ref('Hello,Vue11!')
+                    return {
+                        message
+                    }
+                }
+            }
+            Vue.createApp(HelloVueApp).mount('#hello-vue')
+        </script>
+    </body>
+</html>

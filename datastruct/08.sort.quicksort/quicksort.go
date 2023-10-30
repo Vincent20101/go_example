@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"math/rand"
 	"time"
 )
 
@@ -44,13 +43,13 @@ func quickSort(arr *[]int, start, end int) {
 
 func main() {
 	arrSize := 10
-	arr := []int{}
-	rand.Seed(time.Now().UnixNano())
-	for i := 0; i < arrSize; i++ {
-		arr = append(arr, rand.Intn(50))
-	}
-	fmt.Println("初始数组：", arr)
-
+	//arr := []int{}
+	//rand.Seed(time.Now().UnixNano())
+	//for i := 0; i < arrSize; i++ {
+	//	arr = append(arr, rand.Intn(50))
+	//}
+	//fmt.Println("初始数组：", arr)
+	arr := []int{3, 9, 2, 8, 1, 7, 4, 6, 5, 10}
 	start := time.Now()
 	quickSort(&arr, 0, arrSize-1)
 	finish := time.Now()
