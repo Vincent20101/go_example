@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net"
+	"time"
 
 	"github.com/vincent20101/go-example/grpc/metadata_test/proto"
 
@@ -15,7 +16,7 @@ type Server struct{}
 
 func (s *Server) SayHello(ctx context.Context, request *proto.HelloRequest) (*proto.HelloReply,
 	error) {
-
+	time.Sleep(3 * time.Second)
 	fmt.Println("a的值:", ctx.Value("a"))
 	md, ok := metadata.FromIncomingContext(ctx)
 	fmt.Println(md)

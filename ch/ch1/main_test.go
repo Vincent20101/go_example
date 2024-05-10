@@ -31,9 +31,11 @@ FCAK:
 			fmt.Println("goods", goods)
 		case <-ticker: // 产生新的chan =》 case每一次都是获取新的chan的信息
 			fmt.Println("超时")
+			break
+		// default: // 当其他的分支阻塞的时候才执行
+		// fmt.Println("default")
+		case <-time.After(200e9):
 			break FCAK
-			// default: // 当其他的分支阻塞的时候才执行
-			// fmt.Println("default")
 		}
 	}
 
@@ -44,5 +46,5 @@ FCAK:
 	// 	fmt.Println("goods", goods)
 	// }
 
-	// 	fmt.Println("kk")
+	fmt.Println("kk")
 }

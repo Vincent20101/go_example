@@ -6,10 +6,10 @@ import (
 )
 
 func main() {
-	//through()
+	through()
 	//swith()
 	//delete(nil, 1)
-	forSwitch()
+	//forSwitch()
 }
 
 func forSwitch() {
@@ -32,12 +32,18 @@ func forSwitch() {
 func through() {
 	var a = 1
 	switch a {
+	case 0:
+		fmt.Println("0")
 	case 1:
 		fmt.Println("sdfsdf")
+		fallthrough
+	case 11:
+		fmt.Println("1.5")
 		fallthrough
 	case 2:
 		fmt.Println("2")
 	case 3:
+		fmt.Println("third")
 		fmt.Println("3")
 	}
 }

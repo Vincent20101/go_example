@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net"
 
+	"google.golang.org/grpc/reflection"
+
 	"github.com/vincent20101/go-example/grpc/grpc_token_auth_test/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
@@ -40,10 +42,12 @@ func main() {
 		if va1, ok := md["appid"]; ok {
 			appid = va1[0]
 		}
+		fmt.Println("appid:", appid)
 
 		if va1, ok := md["appkey"]; ok {
 			appkey = va1[0]
 		}
+		fmt.Println("appkey:", appkey)
 
 		if appid != "101010" || appkey != "i am key" {
 			return resp, status.Error(codes.Unauthenticated, "无token认证信息")
@@ -55,13 +59,16 @@ func main() {
 	}
 
 	opt := grpc.UnaryInterceptor(interceptor)
-	grpc.MaxConcurrentStreams()
+	//grpc.MaxConcurrentStreams()
 	g := grpc.NewServer(opt)
 	proto.RegisterGreeterServer(g, &Server{})
 	lis, err := net.Listen("tcp", "0.0.0.0:12345")
 	if err != nil {
 		panic("failed to listen:" + err.Error())
 	}
+
+	// Register reflection service on gRPC server.
+	reflection.Register(g)
 	err = g.Serve(lis)
 	if err != nil {
 		panic("failed to start grpc:" + err.Error())

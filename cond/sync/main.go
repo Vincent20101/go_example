@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"sync"
-	"time"
 )
 
 func main() {
@@ -13,13 +12,13 @@ func main() {
 
 	// 生产者协程
 	go func() {
-		for i := 1; i <= 100; i++ {
+		for i := 1; i <= 10; i++ {
 			cond.L.Lock()
 			queue = append(queue, i)
 			cond.Signal() // 发送信号给等待的协程
 			cond.L.Unlock()
-
-			time.Sleep(time.Second * 2) // 模拟生产速度
+			fmt.Println("push end")
+			//time.Sleep(time.Second * 2) // 模拟生产速度
 		}
 	}()
 

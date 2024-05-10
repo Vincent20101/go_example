@@ -8,9 +8,65 @@ import (
 	"strings"
 	"sync/atomic"
 	"time"
+
+	"github.com/davecgh/go-spew/spew"
 )
 
 func main() {
+	type URRID struct {
+		UrrIdValue uint32
+	}
+	type flow struct {
+		age  int64
+		name string
+		work []*URRID
+	}
+	var fl = flow{
+		age:  12,
+		name: "hb",
+		work: make([]*URRID, 0),
+	}
+	flw := URRID{
+		UrrIdValue: 12,
+	}
+	fl.work = append(fl.work, &flw)
+	for i, v := range fl.work {
+		fmt.Println(i, v.UrrIdValue)
+	}
+	fmt.Println(fl.work)
+
+	var fl1 = &flow{
+		age:  12,
+		name: "hb",
+	}
+
+	var fl2 = &flow{
+		age:  12,
+		name: "hb",
+	}
+	var fl3 = &flow{}
+	fl3 = nil
+
+	fl4 := fl1
+	fmt.Println(fl1 == fl2)
+	fmt.Println(nil == fl2)
+	fmt.Println(fl1 == fl3)
+	fmt.Println(fl1 == fl4)
+	fmt.Println(fl1)
+	fmt.Println(spew.Sdump(fl1))
+
+	var tslices = make([]int, 10, 50)
+	tslices = append([]int{}, 1, 2, 3, 4, 5, 6, 7, 8, 9)
+	var sts = make([]int, 10, 50)
+	sfs := append(tslices, 11, 22, 33)
+	sts = append([]int{}, sfs...)
+	fmt.Println(tslices)
+	fmt.Println(sfs)
+	fmt.Println(sts)
+
+	fmt.Println(fmt.Sprintf("%X", 0xFF))
+	fmt.Println(strconv.FormatInt(int64(0xFF), 16))
+
 	var a11 int = 111
 	if true {
 		a11 := 222

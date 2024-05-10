@@ -1,8 +1,28 @@
 package main
 
-import "unsafe"
+import (
+	"fmt"
+	"time"
+	"unsafe"
+)
 
 func main() {
+	// 获取当前时间
+	currentTime := time.Now()
+
+	// 假设你有另一个时间值 otherTime
+	otherTime := time.Now().Add(-10 * time.Minute) // 假设 otherTime 是当前时间的10分钟之前
+	//var otherTime time.Time
+
+	// 计算两个时间的差值
+	timeDiff := currentTime.Sub(otherTime)
+
+	// 判断差值是否大于5分钟
+	if timeDiff > 5*time.Minute {
+		fmt.Println("时间差大于5分钟")
+	} else {
+		fmt.Println("时间差小于或等于5分钟")
+	}
 
 }
 

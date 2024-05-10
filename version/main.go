@@ -18,12 +18,14 @@ func main() {
 	fmt.Println(strings.Join([]string{"author", "v8.M10.0"}, ":"))
 
 	var (
-		smfsm8M80_tag string = "1.20.25"
-		tag           string = "1.19.2"
+		smfsm8M80_tag string = "v1.21.0"
+		tag           string = "v1.21.0"
 	)
 
 	v1, err1 := version.NewVersion(tag)
 	v2, err2 := version.NewVersion(smfsm8M80_tag)
+	fmt.Println(v1, "===", v2)
+	fmt.Println(err1, "===", err2)
 	if err1 == nil && err2 == nil && v1.LessThanOrEqual(v2) {
 		fmt.Println("v1 less than or equal v2")
 	}

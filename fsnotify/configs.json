@@ -1,0 +1,114 @@
+{
+  "app_id": "PCAP Server Main",
+  "log_level": "INFO",
+  "gc_control": {
+    "disable_default_gc": false,
+    "enable_force": true,
+    "force_policy": {
+      "interval_seconds": 25,
+      "mem_peak": 1
+    }
+  },
+  "configs": [
+    {"key": "sidecar", "path": "/etc/config/config.json", "enableWatchLog": true},
+    {"key": "s3AccessKeyId", "path": "/etc/secrets/aws/accessKeyId", "enableWatchLog": true},
+    {"key": "s3SecretAccessKey", "path": "/etc/secrets/aws/secretAccessKey", "enableWatchLog": true},
+    {"key": "s3ClientCA", "path": "/etc/secrets/pcap/ca.crt", "retryWatchIntervalSec": 5}
+  ],
+  "sub_process_list_bak": [
+    {"launcher_cfg": "/etc/sub_launcher.json", "log_out_prefix": "ServerSub"}
+  ],
+  "components": [
+    {
+      "component_type": "Common",
+      "disable":false,
+      "kw": {
+        "archive_directory": "/tmp/pcapserver"
+      }
+    },
+    {
+      "component_type": "MetricMgr",
+      "disable":false,
+      "kw": {
+        "server_addr": "127.0.0.1:11790",
+        "handle_path": "/metrics"
+      }
+    },
+    {
+      "component_type": "Storage",
+      "disable":false,
+      "kw": {
+        "external_storage_agent": {
+          "agent_type": "s3",
+          "check_point_expire_sec": 15,
+          "max_idle_conn_per_host": 25,
+          "idle_conn_timeout_sec": 120
+        },
+        "upload_workers": {
+          "max_num": 20,
+          "interval": {
+            "wait_ms": 2000,
+            "rw_num": 3000
+          }
+        },
+        "re-upload_worker": {
+          "interval": {
+            "wait_ms": 1800,
+            "rw_num": 15
+          }
+        },
+        "local_storage_worker": {
+          "interval": {
+            "wait_ms": 1500,
+            "rw_num": 20
+          }
+        },
+        "disk_usage_rate_limit": "80%",
+        "enable_simulator_disk": false,
+        "simulator_disk": {
+          "unit": "MB",
+          "size": 100,
+          "free": 90,
+          "avail": 90
+        }
+      }
+    },
+    {
+      "component_type": "InterfaceCapturer",
+      "disable":false,
+      "kw": {
+        "enable_default_socket_opts": false
+      }
+    },
+    {
+      "component_type": "SessionMgr",
+      "disable":false,
+      "kw": {
+        "queue_num": 5,
+        "queue_length": 6000
+      }
+    },
+    {
+      "component_type": "SubscriberCapturer",
+      "disable": false,
+      "kw": {"plugin_type": "UDP", "address": "0.0.0.0:7777", "read_queue_cap": 15000, "read_worker_num": 20}
+    },
+    {
+      "component_type": "Congestion",
+      "disable": false,
+      "kw": {
+        "overload": {
+          "file_path": "/etc/congestion/overload",
+          "retry_watch_interval_sec": 3
+        }
+      }
+    },
+    {
+      "component_type": "CtrlAPI",
+      "disable":false,
+      "kw": {
+        "server_addr": "127.0.0.1:11791"
+      }
+    }
+  ]
+}

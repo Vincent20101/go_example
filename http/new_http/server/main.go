@@ -51,6 +51,8 @@ func main() {
 		//fmt.Printf("Receive [Request: %v]\n", string(rc))
 
 		//fmt.Println("request: ", r.URL.Path)
+		fmt.Println(r.Header.Values("3gpp-Sbi-Target-Apiroot"))
+		fmt.Println(r.Header.Values("3gpp-Sbi-Target-Apiroot"))
 		dump, errs := httputil.DumpRequest(r, true)
 		fmt.Printf("\n%s, DumpRequest error:%v\n", string(dump), errs)
 

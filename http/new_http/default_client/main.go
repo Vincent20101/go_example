@@ -52,22 +52,28 @@ func httpGetWithContext(ctx context.Context) {
 	//reader := strings.NewReader(stus)
 	fmt.Println("reader len: ==== :", reader.Len())
 	req, err := http.NewRequest(http.MethodPost, "http://localhost:8000", reader)
+
+	req.Header.Set("Content-Type", "application/json")
+	//req.Header.Add("User-Agent", "cli")
+	req.Header.Set("Lhb", "application/json")
+	req.Header.Set("3gpp-Sbi-Target-ApiRoot", "http://<HOSTPORT>")
+	fmt.Println("lhb header: ", req.Header.Values("3gpp-Sbi-Target-ApiRoot"))
+
 	dump, errs := httputil.DumpRequestOut(req, true)
 	fmt.Printf("\n%s, DumpRequestOut error:%v\n", string(dump), errs)
 
-	getBody, errs := req.GetBody()
-	var bb []byte = make([]byte, req.ContentLength)
-	fmt.Println("getBody: ", getBody, errs)
-	getBody.Read(bb)
-	fmt.Println(string(bb))
+	//getBody, errs := req.GetBody()
+	//var bb []byte = make([]byte, req.ContentLength)
+	//fmt.Println("getBody: ", getBody, errs)
+	//getBody.Read(bb)
+	//fmt.Println(string(bb))
+	//
+	//fmt.Println("ssss==req==", req)
+	//fmt.Println("ssss====", req.Context())
+	//if err != nil {
+	//	log.Fatal("无法生成请求：", err)
+	//}
 
-	fmt.Println("ssss==req==", req)
-	fmt.Println("ssss====", req.Context())
-	if err != nil {
-		log.Fatal("无法生成请求：", err)
-	}
-	//req.Header.Add("User-Agent", "cli")
-	req.Header.Set("Content-Type", "application/json")
 	ctx = context.WithValue(ctx, "p", "q")
 	//req = req.WithContext(ctx)
 	req = req.WithContext(ctx)
@@ -78,8 +84,8 @@ func httpGetWithContext(ctx context.Context) {
 	fmt.Println("req的值：", req)
 	fmt.Println("req的值：", req.Context())
 
-	//resp, err := http.DefaultClient.Do(req)
-	resp, err := http.Post("http://localhost:8000/", "application/json", reader)
+	resp, err := http.DefaultClient.Do(req)
+	//resp, err := http.Post("http://localhost:8000/", "application/json", reader)
 	//resp, err := http.Get("http://localhost:8000/")
 	//io.Copy(ioutil.Discard, resp.Body)
 	defer func() {
@@ -96,12 +102,12 @@ func httpGetWithContext(ctx context.Context) {
 	//fmt.Printf("dump DumpResponse error:%v\n", dump)
 	//fmt.Printf("\n%s, DumpResponse error:%v\n", string(dump), errs)
 	// 获取请求报文的内容长度
-	length := resp.ContentLength
+	//length := resp.ContentLength
 	// 新建一个字节切片，长度与请求报文的内容长度相同
-	body := make([]byte, length)
+	//body := make([]byte, length)
 	// 读取 r 的请求主体，并将具体内容读入 body 中
-	resp.Body.Read(body)
-	fmt.Println("lhb==", body)
+	//resp.Body.Read(body)
+	//fmt.Println("lhb==", body)
 
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {

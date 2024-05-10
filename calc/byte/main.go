@@ -8,6 +8,7 @@ import (
 )
 
 func main() {
+	fmt.Println(0x10 & 0x8)
 	fmt.Println(strconv.FormatInt(100, 2))
 	fmt.Println(strconv.FormatInt(10, 2))
 	fmt.Println(strconv.FormatInt((100^10)&10, 2))

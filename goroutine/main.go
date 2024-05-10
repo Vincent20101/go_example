@@ -21,3 +21,17 @@ func main() {
 	time.Sleep(time.Millisecond)
 	fmt.Println(a)
 }
+
+func tg() {
+	for i := 0; i < 10; i++ {
+		go func(i int) {
+			go func(ii int) {
+				go func(iii int) {
+					time.Sleep(5 * time.Second)
+					var a map[int]int
+					a[iii] = iii
+				}(ii)
+			}(i)
+		}(i)
+	}
+}

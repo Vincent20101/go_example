@@ -18,6 +18,9 @@ func main01() {
 }
 
 func say(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	// 再次写入响应头，导致冗余调用
+	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("hello world"))
 }
 

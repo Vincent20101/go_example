@@ -11,6 +11,9 @@ import (
 )
 
 func main() {
+	fmt.Println(10 % 4)
+	fmt.Println(14 % 4)
+	return
 	u, err := url.Parse("http://www.baidu.com:8080/test")
 	fmt.Println(u.Host, u.Path, err)
 	addr, err := net.ResolveIPAddr("ip4", "www.baidu.com")
@@ -36,7 +39,7 @@ func main() {
 
 	fmt.Println(ParseHost("172.29.95.4:8081"))
 	fmt.Println(net.LookupIP("www.baidu.com"))
-	_ = make([]byte, -100)
+	//_ = make([]byte, -100)
 	fmt.Println(-1 < 0)
 }
 

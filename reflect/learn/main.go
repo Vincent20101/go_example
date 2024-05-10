@@ -9,6 +9,11 @@ import (
 type User struct {
 	Name string `json:"name" bson:"b_name"`
 	Age  int    `json:"age" bson:"b_age"`
+	Test *Test  `json:"test" bson:"b_test"`
+}
+
+type Test struct {
+	Port uint16 `json:"port" bson:"b_port"`
 }
 
 func (u User) String(prefix string) {
@@ -31,7 +36,7 @@ func main() {
 
 // 反射的基本用法
 func reflectBaisc() {
-	u := User{"cnych", 30}
+	u := User{"cnych", 30, &Test{}}
 
 	//<Value,Type>
 	t := reflect.TypeOf(u)
@@ -56,9 +61,10 @@ func reflectBaisc() {
 
 // 循环获取结构体的熟悉和方法
 func reflectLoopStruct() {
-	u := User{"张三", 20}
+	u := &User{"张三", 20, &Test{Port: 80}}
 
-	t := reflect.TypeOf(u)
+	t := reflect.TypeOf(u.Test)
+	fmt.Println(t.Kind())
 	for i := 0; i < t.NumField(); i++ {
 		f := t.Field(i)
 		fmt.Printf("fieldIndex: %d, fieldName: %s\n", f.Index, f.Name)
@@ -83,7 +89,7 @@ func reflectChangeFiledValue() {
 
 // 动态调用方法
 func reflectDynamicCallMethod() {
-	u := User{"优点知识", 20}
+	u := User{"优点知识", 20, &Test{}}
 
 	v := reflect.ValueOf(u)
 

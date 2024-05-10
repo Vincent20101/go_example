@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/vincent20101/go-example/grpc/metadata_test/proto"
 
@@ -27,6 +28,7 @@ func main() {
 	})
 	ctx1 := context.WithValue(context.Background(), "a", "b")
 	ctx := metadata.NewOutgoingContext(ctx1, md)
+	ctx, _ = context.WithTimeout(ctx, time.Second)
 	r, err := c.SayHello(ctx, &proto.HelloRequest{Name: "bobby"})
 	fmt.Println("a的值为：", ctx.Value("a"))
 	if err != nil {
