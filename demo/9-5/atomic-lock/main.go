@@ -44,4 +44,7 @@ func main() {
 	//cond.Broadcast()
 	log.Println("Signal end")
 	time.Sleep(time.Second * 10)
+
+	c := make(chan int)
+	close(c)
 }

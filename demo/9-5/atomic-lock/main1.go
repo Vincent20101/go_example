@@ -12,13 +12,15 @@ func init() {
 
 var mu sync.Mutex
 var cond = sync.NewCond(&mu)
-var pendingTask = 0
+var pendingTask int32
+
+const maxTask = 100
 
 func main() {
 	producer()
 
 	//启动多个消费者消费
-	for i := 0; i < 10; i++ {
+	for i := 0; i < maxTask; i++ {
 		consumer()
 	}
 	select {}
@@ -31,7 +33,7 @@ func producer() {
 			//wait的调用必须加锁
 			cond.L.Lock()
 			//任务太多时，暂停生产任务，等待消费者消费任务
-			if pendingTask == 10 {
+			if pendingTask == 2*maxTask {
 				log.Println("too many task,waiting consume...  pendingTask:", pendingTask)
 				cond.Wait()
 			}
