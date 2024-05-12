@@ -33,7 +33,7 @@ func main() {
 	//id>10 10  20
 	//id >20 10  30
 	limit := 10
-	bachCnt := 0
+	batchCnt := 0
 	for {
 		var users []User
 		err := o.Raw("select * from "+tableName+" where id > ? order by id asc limit ?", minId, limit).Scan(&users).Error
@@ -45,15 +45,15 @@ func main() {
 			log.Println("end!")
 			return
 		}
-		bachCnt += 1
+		batchCnt += 1
 		minId = users[len(users)-1].ID
 		for _, user := range users {
-			if bachCnt <= 2 {
+			if batchCnt <= 2 {
 				log.Printf("%+v", user)
 			}
 		}
-		if bachCnt <= 2 {
-			log.Println("bachCnt", bachCnt)
+		if batchCnt <= 2 {
+			log.Println("batchCnt", batchCnt)
 		}
 	}
 
