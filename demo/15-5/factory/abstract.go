@@ -20,78 +20,54 @@ type Sofa interface {
 	HasCushions() bool
 }
 
-// 桌子接口
-type Table interface {
-	Furniture
-	HasDrawer() bool
-}
-
 // 抽象工厂接口
 type FurnitureFactory interface {
 	CreateChair() Chair
 	CreateSofa() Sofa
-	CreateTable() Table
 }
 
-// 现代风格家具
+// 现代风格的椅子家具
 type ModernChair struct{}
 
-func (c ModernChair) GetStyle() string {
+func (m ModernChair) GetStyle() string {
 	return "Modern"
 }
 
-func (c ModernChair) GetBrand() string {
-	return "BrandA"
+func (m ModernChair) GetBrand() string {
+	return "Levis"
 }
 
-func (c ModernChair) HasLegs() bool {
+func (m ModernChair) HasLegs() bool {
 	return true
 }
 
+// 现代风格的沙发家具
 type ModernSofa struct{}
 
-func (s ModernSofa) GetStyle() string {
+func (m ModernSofa) GetStyle() string {
 	return "Modern"
 }
 
-func (s ModernSofa) GetBrand() string {
-	return "BrandB"
+func (m ModernSofa) GetBrand() string {
+	return "Adidas"
 }
 
-func (s ModernSofa) HasCushions() bool {
-	return true
-}
-
-type ModernTable struct{}
-
-func (t ModernTable) GetStyle() string {
-	return "Modern"
-}
-
-func (t ModernTable) GetBrand() string {
-	return "BrandC"
-}
-
-func (t ModernTable) HasDrawer() bool {
+func (m ModernSofa) HasCushions() bool {
 	return true
 }
 
 // 现代风格家具工厂
 type ModernFurnitureFactory struct{}
 
-func (f ModernFurnitureFactory) CreateChair() Chair {
+func (m ModernFurnitureFactory) CreateChair() Chair {
 	return ModernChair{}
 }
 
-func (f ModernFurnitureFactory) CreateSofa() Sofa {
+func (m ModernFurnitureFactory) CreateSofa() Sofa {
 	return ModernSofa{}
 }
 
-func (f ModernFurnitureFactory) CreateTable() Table {
-	return ModernTable{}
-}
-
-// 古典风格家具
+// 古典风格的椅子家具
 type ClassicChair struct{}
 
 func (c ClassicChair) GetStyle() string {
@@ -99,71 +75,56 @@ func (c ClassicChair) GetStyle() string {
 }
 
 func (c ClassicChair) GetBrand() string {
-	return "BrandD"
+
+	return "Fender"
 }
 
 func (c ClassicChair) HasLegs() bool {
 	return true
 }
 
+// 古典风格的沙发家具
 type ClassicSofa struct{}
 
-func (s ClassicSofa) GetStyle() string {
+func (c ClassicSofa) GetStyle() string {
 	return "Classic"
 }
 
-func (s ClassicSofa) GetBrand() string {
-	return "BrandE"
+func (c ClassicSofa) GetBrand() string {
+	return "Gucci"
 }
 
-func (s ClassicSofa) HasCushions() bool {
+func (c ClassicSofa) HasCushions() bool {
 	return true
-}
-
-type ClassicTable struct{}
-
-func (t ClassicTable) GetStyle() string {
-	return "Classic"
-}
-
-func (t ClassicTable) GetBrand() string {
-	return "BrandF"
-}
-
-func (t ClassicTable) HasDrawer() bool {
-	return false
 }
 
 // 古典风格家具工厂
 type ClassicFurnitureFactory struct{}
 
-func (f ClassicFurnitureFactory) CreateChair() Chair {
+func (c ClassicFurnitureFactory) CreateChair() Chair {
 	return ClassicChair{}
 }
 
-func (f ClassicFurnitureFactory) CreateSofa() Sofa {
+func (c ClassicFurnitureFactory) CreateSofa() Sofa {
 	return ClassicSofa{}
 }
 
-func (f ClassicFurnitureFactory) CreateTable() Table {
-	return ClassicTable{}
-}
-
-// 客户端代码
 func main() {
 	// 创建现代风格家具工厂
-	modernFactory := ModernFurnitureFactory{}
-	classicFactory := ClassicFurnitureFactory{}
+	modernFurnitureFactory := ModernFurnitureFactory{}
 
-	// 创建椅子
-	modernChair := modernFactory.CreateChair()
+	// 创建现代风格的椅子
+	modernChair := modernFurnitureFactory.CreateChair()
 	fmt.Printf("Modern Chair: Style - %s, Brand - %s, HasLegs - %t\n", modernChair.GetStyle(), modernChair.GetBrand(), modernChair.HasLegs())
 
-	// 创建沙发
-	classicSofa := classicFactory.CreateSofa()
-	fmt.Printf("Classic Sofa: Style - %s, Brand - %s, HasCushions - %t\n", classicSofa.GetStyle(), classicSofa.GetBrand(), classicSofa.HasCushions())
+	// 创建古典风格家具工厂
+	classicFurnitureFactory := ClassicFurnitureFactory{}
 
-	// 创建桌子
-	modernTable := modernFactory.CreateTable()
-	fmt.Printf("Modern Table: Style - %s, Brand - %s, HasDrawer - %t\n", modernTable.GetStyle(), modernTable.GetBrand(), modernTable.HasDrawer())
+	// 创建古典风格的椅子
+	classicChair := classicFurnitureFactory.CreateChair()
+	fmt.Printf("Classic Chair: Style - %s, Brand - %s, HasLegs - %t\n", classicChair.GetStyle(), classicChair.GetBrand(), classicChair.HasLegs())
+
+	// 创建古典风格的沙发
+	classicSofa := classicFurnitureFactory.CreateSofa()
+	fmt.Printf("Classic Sofa: Style - %s, Brand - %s, HasCushions - %t\n", classicSofa.GetStyle(), classicSofa.GetBrand(), classicSofa.HasCushions())
 }
