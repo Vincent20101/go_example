@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 func main() {
 	// 模拟并发调用实例对象
@@ -9,7 +12,7 @@ func main() {
 			GetInstance()
 		}()
 	}
-
+	time.Sleep(time.Second)
 }
 
 type Instance struct {
