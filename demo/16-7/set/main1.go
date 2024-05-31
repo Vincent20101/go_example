@@ -17,9 +17,8 @@ func main() {
 	}
 
 	runtime.GC()
-	printMemStats("添加1万个键值对后")
-
 	log.Println("删除前Map长度：", len(a))
+	printMemStats("添加1万个键值对后")
 	for i := 0; i < 10000-1; i++ {
 		delete(a, i)
 	}
@@ -30,8 +29,8 @@ func main() {
 	printMemStats("删除1万个键值对后")
 
 	// 设置为nil进行回收
-	runtime.GC()
 	a = nil
+	runtime.GC()
 	printMemStats("设置为nil后")
 }
 
