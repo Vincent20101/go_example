@@ -1,32 +1,55 @@
 package main
 
-// 二叉树定义
-type BNode struct {
-	Data       interface{}
-	LeftChild  *BNode
-	RightChild *BNode
+import "fmt"
+
+type TreeNode struct {
+	Val   int
+	Left  *TreeNode
+	Right *TreeNode
 }
 
-func NewBTree() *BNode {
-	return &BNode{}
-}
-
-// 通过数组创建中序的二叉树
-func ArrayToTree(arr []int, start int, end int) *BNode {
-	var root *BNode
-	if end >= start {
-		root = &BNode{}
-		mid := (start + end + 1) / 2
-		//树的根结点为数组中间的元素
-		root.Data = arr[mid]
-		//递归的用左半部分数组构造root的左子树
-		root.LeftChild = ArrayToTree(arr, start, mid-1)
-		//递归的用右半部分数组构造root的右子树
-		root.RightChild = ArrayToTree(arr, mid+1, end)
+func (node *TreeNode) Insert(val int) {
+	// 递归找到插入位置并创建新节点
+	if val < node.Val {
+		if node.Left == nil {
+			node.Left = &TreeNode{Val: val}
+		} else {
+			node.Left.Insert(val)
+		}
+	} else {
+		if node.Right == nil {
+			node.Right = &TreeNode{Val: val}
+		} else {
+			node.Right.Insert(val)
+		}
 	}
-	return root
+}
+
+func (node *TreeNode) Print() {
+	queue := []*TreeNode{node} // 创建队列，初始包含根节点
+	for len(queue) > 0 {
+		current := queue[0]         // 获取队列的第一个元素
+		queue = queue[1:]           // 队列去掉第一个元素
+		fmt.Print(current.Val, " ") // 访问当前节点
+
+		if current.Left != nil {
+			queue = append(queue, current.Left) // 左子节点入队
+		}
+		if current.Right != nil {
+			queue = append(queue, current.Right) // 右子节点入队
+		}
+	}
 }
 
 func main() {
-
+	// 创建根节点
+	root := &TreeNode{Val: 5}
+	// 插入元素
+	root.Insert(3)
+	root.Insert(8)
+	root.Insert(1)
+	root.Insert(4)
+	root.Insert(6)
+	root.Insert(9)
+	root.Print()
 }
