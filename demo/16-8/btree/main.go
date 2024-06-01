@@ -42,6 +42,13 @@ func (node *TreeNode) Print() {
 }
 
 func main() {
+	/**
+	       5
+	    /     \
+	   3      8
+	 /  \    / \
+	1  4  6   9
+	*/
 	// 创建根节点
 	root := &TreeNode{Val: 5}
 	// 插入元素
