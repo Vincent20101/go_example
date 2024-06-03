@@ -54,6 +54,8 @@ func (s *Set) Has(item int) bool {
 
 // 查看集合大小
 func (s *Set) Len() int {
+	s.RLock()
+	defer s.RUnlock()
 	return len(s.m)
 }
 
