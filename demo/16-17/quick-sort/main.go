@@ -10,6 +10,7 @@ func QuickSort(array []int, begin, end int) {
 	if begin < end {
 		// 进行切分
 		loc := partition(array, begin, end)
+		log.Println("QuickSort:", array, begin, end, loc)
 		// 对左部分进行快排
 		QuickSort(array, begin, loc-1)
 		// 对右部分进行快排
@@ -26,6 +27,7 @@ func partition(array []int, begin, end int) int {
 	for i < j {
 		if array[i] > array[begin] {
 			array[i], array[j] = array[j], array[i] // 交换
+			log.Println("partition1:", array, begin, end, i, j)
 			j--
 		} else {
 			i++
@@ -43,12 +45,13 @@ func partition(array []int, begin, end int) int {
 	}
 
 	array[begin], array[i] = array[i], array[begin]
+	log.Println("partition2:", array, begin, end, i, j)
 	return i
 }
 
 // 非递归快速排序
 func QuickSort2(array []int) {
-	
+
 	st := stack.ArrayStack{}
 
 	// 第一次初始化栈，推入下标0，len(array)-1，表示第一次对全数组范围切分
@@ -79,23 +82,7 @@ func QuickSort2(array []int) {
 }
 
 func main() {
-	list := []int{3}
+	list := []int{9, 7, 5, 11, 12, 2, 14, 3, 10, 6}
 	QuickSort(list, 0, len(list)-1)
 	log.Println(list)
-
-	list1 := []int{3, 8}
-	QuickSort(list1, 0, len(list1)-1)
-	log.Println(list1)
-
-	list2 := []int{3, 8, 5}
-	QuickSort(list2, 0, len(list2)-1)
-	log.Println(list2)
-
-	list3 := []int{3, 8, 5, 1, 9, 6}
-	QuickSort(list3, 0, len(list3)-1)
-	log.Println(list3)
-
-	list4 := []int{3, 8, 5, 1, 9, 6}
-	QuickSort2(list4)
-	log.Println(list4)
 }
