@@ -7,11 +7,16 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"time"
 )
 
 func startWebserver() {
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println(r.URL.Host)
+		fmt.Println(r.URL.Path)
+		fmt.Println(r.Host)
+		fmt.Fprintf(w, "Hello, %q", html.EscapeString(r.URL.Host))
 		fmt.Fprintf(w, "Hello, %q", html.EscapeString(r.URL.Path))
 	})
 
@@ -40,7 +45,7 @@ func startLoadTest() {
 func main() {
 
 	startWebserver()
-
+	time.Sleep(time.Second * 10)
 	startLoadTest()
 
 }

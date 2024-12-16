@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"sync"
+	"time"
 )
 
 var wg sync.WaitGroup
@@ -19,6 +20,7 @@ func main() {
 
 func send(start, end int, ch chan<- int) {
 	for i := start; i < end; i++ {
+		time.Sleep(1 * time.Second)
 		ch <- i
 	}
 	close(ch)

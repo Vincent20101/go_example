@@ -21,9 +21,13 @@ import (
 type Server struct{}
 
 func (s *Server) SayHello(ctx context.Context, request *gproto.HelloRequest) (*gproto.HelloReply, error) {
-	//time.Sleep(5 * time.Second)
+	time.Sleep(5 * time.Second)
 	if ctx.Err() == context.Canceled {
 		return nil, status.Errorf(codes.Canceled, "SearchService.Search canceled")
+	}
+	if ctx.Err() == context.DeadlineExceeded {
+		fmt.Println("DeadlineExceeded")
+		return nil, status.Errorf(codes.DeadlineExceeded, "SearchService.Search DeadlineExceeded")
 	}
 	//time.Sleep(20 * time.Second)
 	fmt.Println("test")
@@ -32,9 +36,10 @@ func (s *Server) SayHello(ctx context.Context, request *gproto.HelloRequest) (*g
 		panic(err)
 	}
 	defer conn.Close()
-
+	//time.Sleep(2 * time.Second)
 	client := gproto.NewGreeterClient(conn)
 	ctx1, _ := context.WithTimeout(ctx, 30*time.Second)
+	//ctx1, _ := context.WithTimeout(context.Background(), 3*time.Second)
 	fmt.Println("进来了")
 	//time.Sleep(2 * time.Second)
 	r, err := client.SayHello(ctx1, &gproto.HelloRequest{Name: "bobby"}, grpc.ForceCodec(&codec.JSONCoder{}))

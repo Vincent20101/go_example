@@ -56,8 +56,8 @@ func main() {
 	//fmt.Println(r)
 
 	i := rand.Int()
-	fmt.Println(i)
-	fmt.Println(rand.Intn(10))
+	fmt.Println("int random:", i)
+	fmt.Println("10 random:", rand.Intn(10))
 
 	fmt.Println(strings.Split("vzwaudit.mnc010.mcc310.gprs", ".")[0])
 

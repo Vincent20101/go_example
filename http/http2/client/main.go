@@ -26,11 +26,15 @@ func main() {
 		},
 	}
 
-	request, err := http.NewRequest("GET", "http://localhost:8080", nil)
+	request, err := http.NewRequest("GET", "http://172.0.3.64", nil)
+	//request.Host = "localhost:8082"
+	//request.URL.Host = "localhost:8080"
+	fmt.Println("request.Host:", request.Host)
+	fmt.Println("request.URL.Host:", request.URL.Host)
 	if err != nil {
 		log.Fatal(err)
 	}
-
+	fmt.Printf("request context: %+v\n", request)
 	response, err := client.Do(request)
 	if err != nil {
 		log.Fatal(err)

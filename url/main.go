@@ -13,15 +13,14 @@ import (
 func main() {
 	fmt.Println(10 % 4)
 	fmt.Println(14 % 4)
-	return
 	u, err := url.Parse("http://www.baidu.com:8080/test")
-	fmt.Println(u.Host, u.Path, err)
+	fmt.Println(u.Host, u.Path, u.Hostname(), err)
 	addr, err := net.ResolveIPAddr("ip4", "www.baidu.com")
 	fmt.Println(addr, err)
 	ip, err := net.LookupIP("www.baidu.com")
 	fmt.Println(ip, err)
-	port, p, err := net.SplitHostPort("smfsm.com:80")
-	fmt.Println(port, p, err)
+	hh, p, err := net.SplitHostPort("https://smfsm.com:80")
+	fmt.Println("SplitHostPort", hh, p, err)
 	v4, v6 := LookUpIPAddrFromFqdn("www.baidu.com")
 	fmt.Println(v4, v6)
 	fmt.Println(net.ParseIP("127.0.0.1:8888"))

@@ -22,13 +22,18 @@ func main() {
 	client := gproto.NewGreeterClient(conn)
 	//fmt.Println("waiting for...")
 	//time.Sleep(time.Second * 10)
-	ctx, _ := context.WithTimeout(context.Background(), 1*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	go func() {
+		time.Sleep(time.Second)
+		cancel()
+	}()
 	rsp, err := client.SayHello(ctx, &gproto.HelloRequest{Name: "bobby"}, grpc.ForceCodec(&codec.JSONCoder{}))
 	if err != nil {
 		panic(err)
 		//fmt.Println(err)
 	}
-	fmt.Println(rsp.Message)
+	time.Sleep(time.Second * 2)
+	fmt.Println("rsp:", rsp.Message)
 	//time.Sleep(100 * time.Second)
 	//fmt.Println(r.Message)
 	//http.StatusTemporaryRedirect

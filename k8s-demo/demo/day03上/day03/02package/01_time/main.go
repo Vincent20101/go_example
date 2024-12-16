@@ -30,7 +30,7 @@ func main() {
 	fmt.Printf("%d-%02d-%02d %02d-%02d-%02d \n", year, month, day, hour, minute, second)
 
 	//时间戳
-	timestamp1 := now.Unix() //当前时间的秒时间戳
+	timestamp1 := now.Unix()     //当前时间的秒时间戳
 	timestamp2 := now.UnixNano() //当前时间的纳秒时间戳
 	fmt.Println(timestamp1, timestamp2)
 	//秒时间戳转时间类型
@@ -48,11 +48,11 @@ func main() {
 	//add
 	now1 := time.Now()
 	fmt.Println(now1)
-	duration, _ := time.ParseDuration("1m")  // 60 * time.Second
+	duration, _ := time.ParseDuration("1m") // 60 * time.Second
 	m1 := now1.Add(duration)
-	fmt.Println(m1)
+	tureOrFalse := m1.After(now1)
+	fmt.Println(m1, tureOrFalse)
 
 	//sub
 	fmt.Println(now1.Sub(m1))
 }
-

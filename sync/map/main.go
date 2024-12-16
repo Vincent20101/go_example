@@ -18,7 +18,14 @@ func main() {
 
 	usReqRspPairLoad := &ReqRspPair{
 		lastStepNo: 1,
+		Rsp:        11,
 	}
+
+	pair.Store(usReqRspPairLoad.Rsp, usReqRspPairLoad.Rsp)
+	v, _ := pair.Load(usReqRspPairLoad.Rsp)
+	i := v.(int)
+	fmt.Println("i: ", i)
+
 	pair.Store(usReqRspPairLoad.lastStepNo, usReqRspPairLoad)
 	value, ok := pair.Load(usReqRspPairLoad.lastStepNo)
 	if !ok {
@@ -36,4 +43,5 @@ func main() {
 
 	fmt.Println(data)
 	fmt.Println(rr.Rsp)
+
 }

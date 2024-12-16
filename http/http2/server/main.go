@@ -13,10 +13,15 @@ import (
 
 func main() {
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println(r.Host)
+		fmt.Println("r.URL.Host:", r.URL.Host)
+		fmt.Println("r.URL", r.URL)
 		fmt.Println(r.Method)
+		fmt.Println(r.Proto)
+		fmt.Println(r.ProtoMinor)
+		fmt.Println(r.ProtoMinor)
 		//time.Sleep(time.Second * 100)
 		w.Header().Set("Content-Type", "text/plain")
-		w.WriteHeader(http.StatusOK)
 		w.WriteHeader(http.StatusOK)
 		//w.Write([]byte("Hello, HTTP/2.0 h2c!"))
 		fmt.Fprintf(w, "Hello, HTTP/2 Cleartext!")

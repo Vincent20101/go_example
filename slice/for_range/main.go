@@ -5,6 +5,10 @@ import "fmt"
 func main() {
 	var s = []int{1, 2, 3, 4, 58, 9, 0, 6, 4, 4, 2}
 
+	tt := append(s, 3, 4, 5)
+	fmt.Printf("%p\n", &s)
+	fmt.Printf("%p\n", &tt)
+
 	for _, v := range s {
 		fmt.Println(v)
 	}

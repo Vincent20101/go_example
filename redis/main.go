@@ -189,6 +189,24 @@ func hashUnmarshal(val []interface{}, f []string, v interface{}) {
 	}
 }
 
+func GetClient() *redis.Client {
+	return redis.NewClient(&redis.Options{
+		Addr:     "172.0.3.64:6379",
+		Password: "", // no password set
+		DB:       0,  // use default DB
+	})
+}
+
 func main() {
-	ExampleClient()
+	//ExampleClient()
+	exists := GetClient().Exists(context.Background(), "taskq:{delayQueue_0}:stream")
+	fmt.Println(exists)
+	fmt.Println(exists.Result())
+	_, err := exists.Result()
+	var a int
+	if err != nil {
+		a := 1
+		fmt.Println("err:", a)
+	}
+	fmt.Println(a)
 }

@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	fmt "fmt"
 	"log"
+	"math"
 	"os"
 	"strconv"
 	"unsafe"
@@ -49,4 +50,5 @@ func main() {
 	v, ok := body.(*int)
 	fmt.Println(v, ok)
 
+	fmt.Println(math.MaxInt)
 }
