@@ -97,6 +97,28 @@ func main() {
 	pd := buf.Bytes()
 
 	data2 := getHttpInfo2()
+
+	/*//decode http2
+	framer := http2.NewFramer(nil, bytes.NewReader(data2))
+	frame, err := framer.ReadFrame()
+	if err != nil {
+		fmt.Println(err)
+	}
+	var headersFrame *http2.HeadersFrame
+	headersFrame, ok := frame.(*http2.HeadersFrame)
+	if !ok {
+		fmt.Println(err)
+	}
+	headers := headersFrame.HeaderBlockFragment()
+	headerss, err := hpack.NewDecoder(4096, nil).DecodeFull(headers)
+	if err != nil {
+		fmt.Println(err)
+	}
+	for _, header := range headerss {
+		fmt.Println(header.Name, header.Value)
+	}
+	return
+	*/
 	payload2 := gopacket.Payload(data2)
 
 	buf2 := gopacket.NewSerializeBuffer()

@@ -55,8 +55,8 @@ func TimerFunc2() {
 			"AfterFunc() after 3 seconds")
 	}
 	Timer1 = time.AfterFunc(DurationOfTime, f2)
-	//Timer1.Stop()
-	//fmt.Println("stop finish")
+	Timer1.Stop()
+	fmt.Println("stop finish")
 	time.Sleep(5 * time.Second)
 }
 

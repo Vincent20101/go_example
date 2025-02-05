@@ -3,6 +3,10 @@ package main
 import "fmt"
 
 func main() {
+	var m1 map[string]string
+	if v, ok := m1["a"]; !ok {
+		fmt.Println(v)
+	}
 	m := make(map[string]string, 10)
 
 	m["s"] = "sdf"

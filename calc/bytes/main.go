@@ -43,9 +43,11 @@ func main() {
 	fmt.Println(strconv.ParseInt("73", 16, 10))
 
 	fmt.Println(hex.DecodeString("1111"))
+
+	fmt.Println(strconv.ParseInt("16", 16, 8))
 }
 
-//整形转换成字节
+// 整形转换成字节
 func IntToBytes(n int) []byte {
 	x := int32(n)
 
@@ -54,7 +56,7 @@ func IntToBytes(n int) []byte {
 	return bytesBuffer.Bytes()
 }
 
-//字节转换成整形
+// 字节转换成整形
 func BytesToInt(b []byte) int {
 	bytesBuffer := bytes.NewBuffer(b)
 

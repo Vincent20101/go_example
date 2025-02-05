@@ -5,10 +5,10 @@ import (
 	"sync"
 )
 
-//总结：如果一个协程A发生了panic  协程B会因为协程A的panic而挂掉
-//如果协程A发生了panic 协程B不能用recover捕获到协程A当中的panic
-//所以 多协程并发的时候绝对不能因为一个子协程的panic而搞死所有的子协程！！！
-//所以 协程当中只有协程自己内部的recover才能捕获到自己抛出的panic
+// 总结：如果一个协程A发生了panic  协程B会因为协程A的panic而挂掉
+// 如果协程A发生了panic 协程B不能用recover捕获到协程A当中的panic
+// 所以 多协程并发的时候绝对不能因为一个子协程的panic而搞死所有的子协程！！！
+// 所以 协程当中只有协程自己内部的recover才能捕获到自己抛出的panic
 var wg sync.WaitGroup
 
 func main() {

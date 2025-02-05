@@ -1,7 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
+	"reflect"
+	"sync"
 
 	"go.uber.org/zap"
 )
@@ -81,4 +84,81 @@ func main() {
 	// 通过指针既可以调用 Read，也可以调用 Write 方法
 	sPtrs[1].Read()
 	sPtrs[1].Write("test")
+
+	var tt []byte
+	st := []byte{}
+	fmt.Println(st)
+	equal := reflect.DeepEqual(tt, st)
+	//equal := bytes.Equal(tt, st)
+	fmt.Println(equal)
+
+	s1Val := S1{}
+	s1Ptr := &S1{}
+	s2Val := S2{}
+	s2Ptr := &S2{}
+
+	var i F
+	i = s1Val
+	i = s1Ptr
+	i = s2Ptr
+
+	//  下面代码无法通过编译。因为 s2Val 是一个值，而 S2 的 f 方法中没有使用值接收器
+	//i = s2Val
+	fmt.Println(i, s2Val)
+
+	trips := []Trip{"a", "b", "c", "d", "e", "f"}
+	var d1 Driver
+	d1.SetTrips(trips)
+	//d1.trips = append(d1.trips, "g")
+	fmt.Println(d1.trips)
+	// 你是要修改 d1.trips 吗？
+	trips[0] = "aa"
+	fmt.Println(trips)
+	fmt.Println(d1.trips)
+
+	stats := Stats{
+		counters: make(map[string]int),
+	}
+	// snapshot 不再受互斥锁保护
+	// 因此对 snapshot 的任何访问都将受到数据竞争的影响
+	// 影响 stats.counters
+	snapshot := stats.Snapshot()
+	fmt.Println(snapshot)
+	snapshot["all"] = 0
+	fmt.Println(snapshot)
+	fmt.Println(stats.Snapshot())
+}
+
+type Trip string
+type Driver struct {
+	trips []Trip
+}
+
+func (d *Driver) SetTrips(trips []Trip) {
+	d.trips = trips
+
+	// right way
+	//d.trips = make([]Trip, len(trips))
+	//copy(d.trips, trips)
+}
+
+type Stats struct {
+	mu sync.Mutex
+
+	counters map[string]int
+}
+
+// Snapshot 返回当前状态。
+func (s *Stats) Snapshot() map[string]int {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	//fmt.Println("Snapshot")
+	//return s.counters
+
+	// right way
+	result := make(map[string]int, len(s.counters))
+	for k, v := range s.counters {
+		result[k] = v
+	}
+	return result
 }
