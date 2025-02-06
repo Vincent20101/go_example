@@ -1,0 +1,19 @@
+git@github.com:Vincent20101/go_example.git
+git subtree add --prefix=目录名 远程仓库名 分支名 --squash
+https://github.com/armstrongli/learn.go.git
+https://github.com/cnych/go-learning.git
+https://gitee.com/phper95/go-interview.git
+https://github.com/pingguoxueyuan/gostudy.git
+https://github.com/cnych/sinaimgmover.git
+https://github.com/cnych/pogo.git
+
+
+# go-interview/demo/4-6/workspace/note.txt
+go work 命令需要 Go 1.18 或更高版本。
+go work init infra sm
+
+go work use ./module1
+go work use ./module2
+
+go work sync
+go work tidy
