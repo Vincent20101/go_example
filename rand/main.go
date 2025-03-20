@@ -3,12 +3,24 @@ package main
 import (
 	"fmt"
 	"math"
+	"math/rand"
 	"time"
-
-	"k8s.io/apimachinery/pkg/util/rand"
+	//"k8s.io/apimachinery/pkg/util/rand"
 )
 
+var newRand *rand.Rand
+
+func init() {
+	newRand = rand.New(rand.NewSource(time.Now().UnixNano()))
+
+}
 func main() {
+
+	fmt.Println(ShakeRandIntn(1, 10))
+	fmt.Println(ShakeRandIntn(1, 10))
+	fmt.Println(ShakeRandIntn(1, 10))
+	fmt.Println(ShakeRandIntn(1, 10))
+	fmt.Println(ShakeRandIntn(1, 10))
 	//rand.Seed(time.Now().Unix())
 	//for i := 0; i < 10; i++ {
 	//	fmt.Println(rand.Intn(50))
@@ -30,4 +42,8 @@ func main() {
 	fmt.Println(s)
 	s = new(int)
 	fmt.Println(s)
+}
+
+func ShakeRandIntn(min, max int) int {
+	return min + newRand.Intn(max-min)
 }

@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 type Mymap[KEY int | string, VALUE float32 | float64] map[KEY]VALUE
 
 type Man struct {
@@ -32,6 +34,17 @@ type CommonType[T interface{ *int } | string] []T
 
 //匿名函数不支持泛型
 
+type GenericSlice[T comparable] []T
+
+func (s GenericSlice[T]) Contains(val T) bool {
+	for _, v := range s {
+		if v == val {
+			return true
+		}
+	}
+	return false
+}
+
 func main() {
 	//company := Company[Man]{
 	//	Name: "bobby",
@@ -46,5 +59,9 @@ func main() {
 	//var c MyChannel[string]
 
 	//几种常见的错误
+	intSlice := GenericSlice[int]{1, 2, 3}
+	fmt.Println(intSlice.Contains(2)) // 输出 true
 
+	strSlice := GenericSlice[string]{"a", "b", "c"}
+	fmt.Println(strSlice.Contains("b")) // 输出 true
 }

@@ -1,14 +1,34 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 type student struct {
-	name  string
-	age   int
-	level int
+	name       string
+	age        int
+	level      int
+	work       *string
+	secondWork []*string
 }
 
 func main() {
+	var point = new(int)
+	*point = 10
+
+	pp := point
+
+	var point2 = new(int)
+	*point2 = 100
+
+	point = point2
+
+	fmt.Println(*pp)
+	fmt.Println(*point)
+	fmt.Println(*point2)
+
+	fmt.Println(128 & 128)
 	var a *int
 	b := 1
 	a = &b
@@ -28,6 +48,11 @@ func main() {
 	}
 
 	s2 := new(student)
+	fmt.Println("s2", s2.work, s2.secondWork)
+	fmt.Println("s2", s2.work == nil, s2.secondWork == nil)
+
+	s := "s:d:1"
+	fmt.Println(strings.Split(s, ":")[0])
 	s2 = s1
 	//*s2 = *s1
 	s2.age = 18
@@ -46,7 +71,7 @@ func main() {
 	fmt.Println(*cc)
 }
 
-//  使用第三变量交换a,b值:go 直接交换值
+// 使用第三变量交换a,b值:go 直接交换值
 func swapTwo(a *int, b *int) {
 	//*a, *b = *b, *a
 	a, b = b, a

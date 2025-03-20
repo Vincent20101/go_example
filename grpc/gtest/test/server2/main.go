@@ -30,7 +30,7 @@ func main() {
 	//g := grpc.NewServer(grpc.CustomCodec(&codec.JSONCoder{}))
 	s := Server{}
 	gproto.RegisterGreeterServer(g, &s)
-	listen, err := net.Listen("tcp", ":8081")
+	listen, err := net.Listen("tcp4", ":8081")
 	if err != nil {
 		panic(err)
 	}

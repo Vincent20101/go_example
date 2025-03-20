@@ -2,10 +2,10 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/Shopify/sarama"
-	"io"
 	"log"
 	"strconv"
+
+	"github.com/Shopify/sarama"
 )
 
 func main() {
@@ -29,7 +29,7 @@ func main() {
 			log.Fatal("Error closing producer: ", err)
 		}
 	}()
-	io.Reader()
+	//io.Reader()
 	user := struct {
 		ID   int    `json:"id"`
 		Name string `json:"name"`

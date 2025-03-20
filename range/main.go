@@ -2,10 +2,13 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 )
 
 func main() {
+	fmt.Println(strconv.ParseFloat(0, 64))
+	fmt.Println(time.Until(time.Now().Add(time.Second * 10)).Milliseconds())
 	task := []string{"a", "b", "c", "d", "e", "f"}
 
 	var m = make(map[int]*string)

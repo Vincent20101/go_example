@@ -4,10 +4,23 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
+	"math"
 	"strconv"
+	"strings"
 )
 
 func main() {
+	var m map[string]int
+	tm := map[string]int{"a": 1, "b": 2, "c": 3}
+	m = tm
+	fmt.Println(len(m))
+	fmt.Println(m)
+	var aaa *int
+	fmt.Println(aaa == nil)
+	bbb := new(int)
+	fmt.Println(bbb == nil)
+	fmt.Println(strings.TrimPrefix("", "imsi-"))
+	fmt.Println(math.Ceil(float64(5) / 10))
 	// 十进制
 	var a int = 10
 	a2 := strconv.FormatInt(int64(a), 2)   //10进制转换为2进制
@@ -37,7 +50,7 @@ func main() {
 	fmt.Println("b3:", b3)
 }
 
-//整形转换成字节
+// 整形转换成字节
 func IntToBytes(n int) []byte {
 	x := int32(n)
 
@@ -46,7 +59,7 @@ func IntToBytes(n int) []byte {
 	return bytesBuffer.Bytes()
 }
 
-//字节转换成整形
+// 字节转换成整形
 func BytesToInt(b []byte) int {
 	bytesBuffer := bytes.NewBuffer(b)
 
@@ -104,7 +117,7 @@ func MyUint16(b []byte) uint16 {
 	return uint16(b[1]) | uint16(b[0])<<8
 }
 
-//同理，可以得出uint32
+// 同理，可以得出uint32
 func MyUint32(b []byte) uint32 {
 	_ = b[3]
 	return uint32(b[0])<<24 | uint32(b[1])<<16 | uint32(b[2])<<8 | uint32(b[3])
