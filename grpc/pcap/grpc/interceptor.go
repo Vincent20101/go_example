@@ -1,0 +1,45 @@
+package grpc
+
+import (
+	"context"
+
+	"gitlab.casa-systems.com/mobility/smf/infra/base/logger"
+
+	"google.golang.org/grpc"
+)
+
+type Subscriber struct {
+}
+
+func UnaryServerInterceptor(lc *logger.LogContext) grpc.UnaryServerInterceptor {
+
+	return func(
+		ctx context.Context,
+		req interface{},
+		info *grpc.UnaryServerInfo,
+		handler grpc.UnaryHandler,
+	) (interface{}, error) {
+
+		// Get the information needed to assemble the package
+		codecInfo := CodecInfoFromContext(ctx, lc)
+		if codecInfo == nil {
+			return handler(ctx, req)
+		}
+		ctx = context.WithValue(ctx, Subscriber{}, codecInfo)
+		resp, err := handler(ctx, req)
+
+		// Carry the information needed to assemble the package in the message
+		msg := &MessageWithCodecInfo{
+			c:    codecInfo,
+			body: resp,
+		}
+
+		return msg, err
+	}
+}
+
+// carry codec information
+type MessageWithCodecInfo struct {
+	c    *CodecInfo // the information needed to assemble the package
+	body interface{}
+}

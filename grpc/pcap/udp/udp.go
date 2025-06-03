@@ -1,0 +1,90 @@
+package udppacket
+
+import (
+	"net"
+
+	"gitlab.casa-systems.com/mobility/smf/infra/base/pcap/common"
+
+	slog "gitlab.casa-systems.com/mobility/smf/infra/base/logger"
+	"gitlab.casa-systems.com/mobility/smf/infra/base/pcap/packet"
+
+	"github.com/google/gopacket/layers"
+)
+
+type PcapPktMgr struct {
+	SrcAddr, DstAddr *net.UDPAddr
+	Data             []byte
+}
+
+func NewPacket(srcAddr *net.UDPAddr, dstAddr *net.UDPAddr, data []byte) *PcapPktMgr {
+	return &PcapPktMgr{SrcAddr: srcAddr, DstAddr: dstAddr, Data: data}
+}
+func Options(localIP, remoteIP net.IP, localPort, remotePort uint16) []packet.Option {
+	opts := make([]packet.Option, 0)
+	localIPv4 := localIP.To4()
+	localIPv6 := localIP.To16()
+	remoteIPv4 := remoteIP.To4()
+	remoteIPv6 := remoteIP.To16()
+
+	if localIPv4 != nil { // IPv4 address
+		opts = append(opts, packet.WithSrcIP(localIPv4))
+		if remoteIPv4 != nil {
+			opts = append(opts, packet.WithDstIP(remoteIPv4))
+		}
+	} else if localIPv6 != nil { // IPv6 address
+		opts = append(opts, packet.WithSrcIP(localIPv6), packet.WithL3Protocol(layers.IPProtocolIPv6))
+		if remoteIPv6 != nil {
+			opts = append(opts, packet.WithDstIP(remoteIPv6))
+		} else {
+			opts = append(opts, packet.WithDstIP(packet.DefaultIPv6))
+		}
+	}
+	if localPort != 0 {
+		opts = append(opts, packet.WithTCPSrcPort(localPort))
+	}
+	if remotePort != 0 {
+		opts = append(opts, packet.WithTCPDstPort(remotePort))
+	}
+	return opts
+}
+
+// assemble s5s8/pfcp pcap message
+func (p *PcapPktMgr) AssemblePcapPacket(lc *slog.LogContext) ([]byte, error) {
+	lc.LogDbg("===AssemblePcapPacket")
+	var localIP, remoteIP net.IP
+	var srcPort, dstPort uint16
+	if p.SrcAddr != nil {
+		if p.SrcAddr.IP.String() != "" {
+			localIP = p.SrcAddr.IP
+		}
+		srcPort = uint16(p.SrcAddr.Port)
+	}
+	if p.DstAddr != nil {
+		if p.DstAddr.IP.String() != "" {
+			remoteIP = p.DstAddr.IP
+		}
+		dstPort = uint16(p.DstAddr.Port)
+	}
+	pl := packet.NewLayer(common.Options(localIP, remoteIP, srcPort, dstPort, common.UDP)...)
+	var pd, err = pl.GeneratePacket(p.Data)
+	if err != nil {
+		return nil, err
+	}
+	return pd, nil
+}
+
+func WritePcapToSidecar(lc *slog.LogContext, srcAddr *net.UDPAddr, dstAddr *net.UDPAddr, pcapNanoTs uint64, data []byte) {
+	lc.LogDbg("===WritePcapToSidecar")
+
+	p := NewPacket(srcAddr, dstAddr, data)
+	pcapPkt, err := p.AssemblePcapPacket(lc)
+
+	if err != nil {
+		lc.LogError("write pcap packet failed: %v", err)
+		return
+	}
+	tpCtx := lc.GetTracePcapContext()
+	if tpCtx != nil {
+		common.WritePcapToSidecar(lc, tpCtx.SubscriberId.Imsi, tpCtx.SubscriberId.Imei, tpCtx.SubscriberId.Msisdn, pcapNanoTs, pcapPkt)
+	}
+}

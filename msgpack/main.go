@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"math"
 
 	"github.com/vmihailenco/msgpack/v5"
 )
@@ -12,6 +13,7 @@ type Item struct {
 }
 
 func main() {
+	fmt.Println(math.MaxUint16)
 	b, err := msgpack.Marshal(&Item{Foo: "bar"})
 	if err != nil {
 		panic(err)

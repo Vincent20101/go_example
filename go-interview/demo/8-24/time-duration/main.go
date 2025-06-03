@@ -2,12 +2,33 @@ package main
 
 import (
 	"fmt"
+	"strings"
 	"time"
 )
 
 func main() {
-	afterUnixMilli1()
+	//afterUnixMilli1()
 	//afterUnixMilli2()
+	timeStr := "2020-01-02T15:04:12Z"
+
+	// 解析时间字符串
+	layout := time.RFC3339 // 使用 RFC3339 格式
+	t, err := time.Parse(layout, timeStr)
+	if err != nil {
+		fmt.Println("Error parsing time:", err)
+		return
+	}
+	fmt.Println(t)
+	fmt.Println(strings.HasPrefix(t.String(), "2020-01-02 15:04"))
+	baseTime, _ := time.Parse(time.RFC3339, "2022-01-01T01:00:00Z")
+	fmt.Println(baseTime)
+	diff := t.Unix() - baseTime.Unix()
+	t1 := time.Now().Add(time.Duration(diff) * time.Second)
+	fmt.Println(t1)
+
+	fmt.Println(t.Second())
+	t2 := time.Now().Add(time.Duration(t.Second()) * time.Second)
+	fmt.Println(t2)
 }
 
 // 获取500ms后的时间戳，单位ms

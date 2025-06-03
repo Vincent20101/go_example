@@ -14,6 +14,8 @@ func main() {
 	// 创建数据包源
 	packet := gopacket.NewPacket(data, layers.LayerTypeIPv4, gopacket.Default)
 
+	fmt.Println(packet.Layer(layers.LayerTypeTCP))
+	fmt.Println(packet.Layer(layers.LayerTypeSCTP))
 	// 获取应用层
 	applicationLayer := packet.ApplicationLayer()
 	if applicationLayer != nil {

@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"net"
 	"reflect"
 )
 
@@ -16,7 +17,7 @@ func main() {
 	s6 := make([]struct{}, 0, 2)
 	fmt.Println(len(s1), len(s5), len(s6))
 
-	return
+	//return
 	var b1 []byte
 	b2 := []byte{}
 	//fmt.Println(reflect.DeepEqual(b1, b2)) //false
@@ -36,4 +37,24 @@ func main() {
 	b6 := []byte{}                         //true
 	fmt.Println(reflect.DeepEqual(b5, b6)) //true
 	fmt.Println(bytes.Equal(b5, b6))       //true
+
+	s11 := []int{1, 2, 3}
+	s12 := []int{1, 3, 2}
+	fmt.Println(reflect.DeepEqual(s11, s12))
+
+	fmt.Println(net.ParseCIDR("fg/24"))
+	fmt.Println(net.ParseIP("fg/24"))
+
+}
+
+func IsValidIPOrCIDR(input string) bool {
+	// 尝试解析 CIDR 格式（带掩码）
+	if _, _, err := net.ParseCIDR(input); err == nil {
+		return true
+	}
+	// 尝试解析普通 IP（不带掩码）
+	if ip := net.ParseIP(input); ip != nil {
+		return true
+	}
+	return false
 }

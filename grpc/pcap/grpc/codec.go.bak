@@ -1,0 +1,551 @@
+package grpc
+
+import (
+	"context"
+	"encoding/base64"
+	"encoding/binary"
+	"errors"
+	"fmt"
+	"net"
+	"time"
+
+	slog "gitlab.casa-systems.com/mobility/smf/infra/base/logger"
+	"gitlab.casa-systems.com/mobility/smf/infra/base/pcap"
+	"gitlab.casa-systems.com/mobility/smf/infra/base/pcap/common"
+	"gitlab.casa-systems.com/mobility/smf/infra/base/pcap/common/udppcaket"
+
+	"github.com/golang/protobuf/proto"
+	"google.golang.org/grpc/metadata"
+)
+
+type ServiceName string
+
+const (
+	ServiceName_GTPC   ServiceName = "gtpc"
+	ServiceName_N4     ServiceName = "n4"
+	ServiceName_CDRMGR ServiceName = "cdrmgr"
+	ServiceName_AAASVC ServiceName = "aaasvc"
+)
+
+const Name = "subscriber-trace"
+
+// will be used by grpc server to marshal/unmarshal all grpc message, need to consider concurrency issues
+type codec struct {
+	DstPort     uint16
+	ServiceName ServiceName
+	Lc          *slog.LogContext
+}
+
+func NewCodec(s ServiceName, dstPort uint16, lc *slog.LogContext) *codec {
+	return &codec{
+		DstPort:     dstPort,
+		ServiceName: s,
+		Lc:          lc,
+	}
+}
+
+func (c *codec) Marshal(v interface{}) ([]byte, error) {
+	vv, ok := v.(*MessageWithCodecInfo)
+	if !ok {
+		return nil, fmt.Errorf("failed to unmarshal, message is %T, want pcap_grpc.Message", v)
+	}
+
+	body, ok := vv.body.(proto.Message)
+	if !ok {
+		return nil, fmt.Errorf("failed to marshal, message is %T, want proto.Message", v)
+	}
+	data, err := proto.Marshal(body)
+
+	payload := make([]byte, len(data))
+	copy(payload, data)
+	pcapNanoTs := uint64(time.Now().UnixNano())
+	go func(lc *slog.LogContext) {
+		// for response, source and destination are swapped
+		if len(vv.c.SrcIp) != 0 && len(vv.c.DstIp) != 0 {
+			packet, _ := NewGrpcPacket(lc, payload, vv.c.Method, common.Options(vv.c.DstIp, vv.c.SrcIp, c.DstPort, 0, common.TCP)...)
+			common.WritePcapToSidecar(lc, vv.c.IMSI, vv.c.IMEI, vv.c.MSISDN, vv.c.UEIP, pcapNanoTs, packet)
+		}
+	}(c.Lc.Copy())
+
+	return data, err
+}
+
+func (c *codec) Unmarshal(data []byte, v interface{}) error {
+	ci := new(CodecInfo)
+	out, err := ci.decode(data)
+	if err != nil {
+		c.Lc.LogError("failed to decode,err:%v", err)
+		return err
+	}
+	payload := make([]byte, len(out))
+	copy(payload, out)
+	pcapNanoTs := uint64(time.Now().UnixNano())
+	go func(lc *slog.LogContext) {
+		if len(ci.SrcIp) != 0 && len(ci.DstIp) != 0 {
+			packet, _ := NewGrpcPacket(lc, payload, ci.Method, common.Options(ci.SrcIp, ci.DstIp, 0, c.DstPort, common.TCP)...)
+			common.WritePcapToSidecar(lc, ci.IMSI, ci.IMEI, ci.MSISDN, ci.UEIP, pcapNanoTs, packet)
+		}
+	}(c.Lc.Copy())
+
+	vv, ok := v.(proto.Message)
+	if !ok {
+		return fmt.Errorf("failed to unmarshal, message is %T, want proto.Message", v)
+	}
+	return proto.Unmarshal(out, vv)
+
+}
+
+func (c *codec) Name() string {
+	return string(c.ServiceName) + "-" + Name
+}
+
+// will be used by grpc client, each grpc message will use a separate codec to avoid concurrency issues
+type forceCodec struct {
+	CodecInfo
+	ServiceName ServiceName
+	Lc          *slog.LogContext
+}
+
+type RemoteAddr struct {
+	Ipv4 net.IP
+	Ipv6 net.IP
+	Port uint16
+}
+
+func (r RemoteAddr) IP() net.IP {
+	if r.Ipv6 != nil {
+		return r.Ipv6
+	}
+
+	if r.Ipv4 != nil {
+		return r.Ipv4
+	}
+	return nil
+}
+
+func newCodecInfo(localAddr, remoteaddr RemoteAddr, subscriberid slog.SubscriberId, method string) *CodecInfo {
+	codecinfo := new(CodecInfo)
+
+	if localAddr.IP() != nil && len(localAddr.IP()) > 0 {
+		codecinfo.SrcIp = localAddr.IP()
+	} else if srcip := pcap.GetLocalAddr(); srcip != nil {
+		codecinfo.SrcIp = srcip
+	}
+
+	codecinfo.DstIp = remoteaddr.IP()
+	codecinfo.DstPort = remoteaddr.Port
+	codecinfo.IMSI = subscriberid.Imsi
+	codecinfo.IMEI = subscriberid.Imei
+	codecinfo.MSISDN = subscriberid.Msisdn
+	codecinfo.Method = method
+	codecinfo.UEIP = subscriberid.GetUeIP()
+
+	return codecinfo
+}
+
+func NewProtoMessageWithCodecInfo(
+	lc *slog.LogContext, message proto.Message, localAddr, remoteaddr RemoteAddr, method string,
+) interface{} {
+	if !lc.IsNeedPcapTrace() {
+		return message
+	}
+
+	messagewithcodecinfo := new(MessageWithCodecInfo)
+	messagewithcodecinfo.c = newCodecInfo(localAddr, remoteaddr, lc.GetTracePcapContext().SubscriberId, method)
+	messagewithcodecinfo.body = message
+
+	return messagewithcodecinfo
+}
+
+func NewForceCodec(s ServiceName, localAddr, remoteAddr RemoteAddr, subscriberId slog.SubscriberId, lc *slog.LogContext, method string) *forceCodec {
+	forceCodec := &forceCodec{
+		CodecInfo:   *newCodecInfo(localAddr, remoteAddr, subscriberId, method),
+		ServiceName: s,
+		Lc:          lc,
+	}
+
+	return forceCodec
+}
+func (c *forceCodec) GetCodecInfo() CodecInfo {
+	return c.CodecInfo
+}
+func (c *forceCodec) Marshal(v interface{}) ([]byte, error) {
+	vv, ok := v.(proto.Message)
+	if !ok {
+		return nil, fmt.Errorf("failed to marshal, message is %T, want proto.Message", v)
+	}
+	data, err := proto.Marshal(vv)
+	if err == nil {
+		payload := make([]byte, len(data))
+		copy(payload, data)
+		pcapNanoTs := uint64(time.Now().UnixNano())
+		go func(lc *slog.LogContext) {
+			packet, _ := NewGrpcPacket(lc, payload, c.Method, common.Options(c.SrcIp, c.DstIp, 0, c.DstPort, common.TCP)...)
+			common.WritePcapToSidecar(lc, c.CodecInfo.IMSI, c.CodecInfo.IMEI, c.CodecInfo.MSISDN, c.CodecInfo.UEIP, pcapNanoTs, packet)
+		}(c.Lc.Copy())
+
+		out, err := c.CodecInfo.encode(data)
+		return out, err
+	}
+	return data, err
+}
+
+func (c *forceCodec) Unmarshal(data []byte, v interface{}) error {
+	payload := make([]byte, len(data))
+	copy(payload, data)
+	pcapNanoTs := uint64(time.Now().UnixNano())
+	// for response, source and destination are swapped
+	go func(lc *slog.LogContext) {
+		packet, _ := NewGrpcPacket(lc, payload, c.Method, common.Options(c.DstIp, c.SrcIp, c.DstPort, 0, common.TCP)...)
+		common.WritePcapToSidecar(lc, c.CodecInfo.IMSI, c.CodecInfo.IMEI, c.CodecInfo.MSISDN, c.CodecInfo.UEIP, pcapNanoTs, packet)
+	}(c.Lc.Copy())
+
+	vv, ok := v.(proto.Message)
+	if !ok {
+		return fmt.Errorf("failed to unmarshal, message is %T, want proto.Message", v)
+	}
+	return proto.Unmarshal(data, vv)
+}
+
+func (c *forceCodec) Name() string {
+	return string(c.ServiceName) + "-" + Name
+}
+
+// the information needed to assemble the package
+type CodecInfo struct {
+	SrcIp   net.IP
+	DstIp   net.IP
+	DstPort uint16
+	IMSI    string
+	IMEI    string
+	MSISDN  string
+	UEIP    string
+	Method  string
+}
+
+const TRACE_INFO string = "trace-info"
+
+func ContextWithTraceInfo(ctx context.Context, c CodecInfo) context.Context {
+
+	data, err := c.encode([]byte(""))
+	if err != nil {
+		return ctx
+	}
+	d := base64.StdEncoding.EncodeToString(data)
+	ctx = metadata.AppendToOutgoingContext(ctx, TRACE_INFO, d)
+
+	return ctx
+}
+
+func CodecInfoFromContext(ctx context.Context, lc *slog.LogContext) *CodecInfo {
+	lc.LogDbg("=====CodecInfoFromContext")
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		lc.LogDbg("get metadata from context is nil ")
+		return nil
+	}
+
+	traceInfo := md.Get(TRACE_INFO)
+	if len(traceInfo) == 0 {
+		return nil
+	}
+	t, err := base64.StdEncoding.DecodeString(traceInfo[0])
+	if err != nil {
+		lc.LogError("base64 decode failed: %v", err)
+		return nil
+	}
+	c := new(CodecInfo)
+	_, err = c.decode(t)
+	if err != nil {
+		lc.LogError("codeInfo decode failed: %v", err)
+		return nil
+	}
+
+	return c
+}
+func (c *CodecInfo) encode(d []byte) (data []byte, err error) {
+	if c == nil {
+		return nil, errors.New(" codecInfo is nil")
+	}
+
+	// Anonymous function for encoding IP addresses
+	encodeIP := func(data []byte, ip net.IP, fieldName string, required bool) ([]byte, error) {
+		if net.ParseIP(ip.String()) != nil {
+			var ipType uint8
+			if ip.To16() != nil {
+				ipType = 1 << 1 // IPv6
+				data = append(data, byte(ipType))
+				data = append(data, ip.To16()...)
+			} else if ip.To4() != nil {
+				ipType = 1 // IPv4
+				data = append(data, byte(ipType))
+				data = append(data, ip.To4()...)
+			} else {
+				return nil, fmt.Errorf("%s is invalid", fieldName)
+			}
+		} else {
+			if required {
+				return nil, fmt.Errorf("%s is out of specification", fieldName)
+			} else {
+				data = append(data, byte(0))
+			}
+		}
+		return data, nil
+	}
+
+	// Encode srcIP
+	if data, err = encodeIP(data, c.SrcIp, "srcIP", true); err != nil {
+		return nil, err
+	}
+
+	// Encode dstIP
+	if data, err = encodeIP(data, c.DstIp, "dstIP", false); err != nil {
+		return nil, err
+	}
+
+	//if net.ParseIP(c.SrcIp.String()) != nil {
+	//	var ipType uint8 = 0
+	//	if c.SrcIp.To16() != nil {
+	//		ipType = 1 << 1
+	//		data = append(data, byte(ipType))
+	//		data = append(data, c.SrcIp.To16()...)
+	//	} else if c.SrcIp.To4() != nil {
+	//		ipType = 1
+	//		data = append(data, byte(ipType))
+	//		data = append(data, c.SrcIp.To4()...)
+	//	} else {
+	//		return nil, errors.New("srcIP is invalid")
+	//	}
+	//} else {
+	//	return nil, errors.New("srcIP is out of specification")
+	//}
+	//
+	//if net.ParseIP(c.DstIp.String()) != nil {
+	//	var ipTypeDst uint8 = 0
+	//	if c.DstIp.To16() != nil {
+	//		ipTypeDst = 1 << 1
+	//		data = append(data, byte(ipTypeDst))
+	//		data = append(data, c.DstIp.To16()...)
+	//	} else if c.DstIp.To4() != nil {
+	//		ipTypeDst = 1
+	//		data = append(data, byte(ipTypeDst))
+	//		data = append(data, c.DstIp.To4()...)
+	//	} else {
+	//		return nil, errors.New("dstIP is invalid")
+	//	}
+	//} else {
+	//	data = append(data, byte(0))
+	//}
+
+	var flag uint8 = 0
+	//SubscriberIdentitiesFlag
+	if c.IMSI != "" {
+		flag = flag | udppcaket.BitMask1
+	}
+	if c.IMEI != "" {
+		flag = flag | udppcaket.BitMask2
+	}
+	if c.MSISDN != "" {
+		flag = flag | udppcaket.BitMask3
+	}
+	if c.UEIP != "" {
+		flag = flag | udppcaket.BitMask4
+	}
+
+	data = append(data, byte(flag))
+	//IMSI
+	if c.IMSI != "" {
+		data = append(data, byte(len(c.IMSI)))
+		data = append(data, []byte(c.IMSI)...)
+	}
+	//IMEI
+	if c.IMEI != "" {
+		data = append(data, byte(len(c.IMEI)))
+		data = append(data, []byte(c.IMEI)...)
+	}
+	//MSISDN
+	if c.MSISDN != "" {
+		data = append(data, byte(len(c.MSISDN)))
+		data = append(data, []byte(c.MSISDN)...)
+
+	}
+	//UEIP
+	if c.UEIP != "" {
+		data = append(data, byte(len(c.UEIP)))
+		data = append(data, []byte(c.UEIP)...)
+	}
+
+	//method
+	data = append(data, byte(len(c.Method)))
+	data = append(data, []byte(c.Method)...)
+
+	//proto message length
+	extTemp := make([]byte, 2)
+	binary.BigEndian.PutUint16(extTemp, uint16(len(d)))
+	data = append(data, extTemp...)
+	//raw proto message
+	data = append(data, d...)
+	return data, nil
+}
+
+func (c *CodecInfo) decode(data []byte) ([]byte, error) {
+	if c == nil {
+		return nil, errors.New("codecInfo is nil")
+	}
+	length := uint16(len(data))
+	var idx uint16 = 0
+	//flag:ipType
+	if length < idx+1 {
+		return nil, fmt.Errorf("codecInfo.InstanceIDLength  Message unqualified length: %d", length)
+	}
+	ipType := data[idx]
+
+	idx++
+	if ipType == 2 {
+		if length < idx+net.IPv6len {
+			return nil, fmt.Errorf("Unmarshal codecInfo.srcIP  unqualified length: %d,idx: %d", length, idx)
+		}
+		c.SrcIp = net.IP(data[idx : idx+net.IPv6len]).To16()
+		idx += net.IPv6len
+	} else if ipType == 1 {
+		if length < idx+net.IPv4len {
+			return nil, fmt.Errorf("unmarshal codecInfo.srcIP unqualified length: %d,idx: %d", length, idx)
+		}
+		c.SrcIp = net.IP(data[idx : idx+net.IPv4len]).To16()
+		idx += net.IPv4len
+	} else {
+		return nil, errors.New("invalid srcIP type")
+	}
+
+	if length < idx+1 {
+		return nil, fmt.Errorf("unmarshal codecInfo.dstIP unqualified length: %d, idx: %d", length, idx)
+	}
+	ipTypeDst := data[idx]
+	idx++
+
+	if ipTypeDst == 2 {
+		if length < idx+net.IPv6len {
+			return nil, fmt.Errorf("Unmarshal codecInfo.dstIP  unqualified length: %d,idx: %d", length, idx)
+		}
+		c.DstIp = net.IP(data[idx : idx+net.IPv6len]).To16()
+		idx += net.IPv6len
+	} else if ipTypeDst == 1 {
+		if length < idx+net.IPv4len {
+			return nil, fmt.Errorf("Unmarshal codecInfo.dstIP unqualified length: %d,idx: %d", length, idx)
+		}
+		c.DstIp = net.IP(data[idx : idx+net.IPv4len]).To16()
+		idx += net.IPv4len
+	} else if ipTypeDst == 0 {
+		// not exist dstIP, noting to do, continue
+	} else {
+		return nil, errors.New("invalid dstIP type")
+	}
+
+	if length < idx+1 {
+		return nil, fmt.Errorf("Unmarshal  codecInfo.flag unqualified length: %d,idx: %d ", length, idx)
+	}
+	flag := data[idx]
+	idx++
+	imsiPres := (flag & udppcaket.BitMask1) != 0
+	imeiPres := (flag & udppcaket.BitMask2) != 0
+	msisdnPres := (flag & udppcaket.BitMask3) != 0
+	ueIp := (flag & udppcaket.BitMask4) != 0
+
+	if imsiPres {
+		//IMSILength
+		if length < idx+1 {
+			return nil, fmt.Errorf("Unmarshal  codecInfo.IMSILength unqualified length: %d,idx: %d", length, idx)
+		}
+		imsiLength := data[idx]
+		idx++
+
+		if imsiLength == 0 {
+			return nil, errors.New("Unmarshal codecInfo.IMSI  unqualified length ")
+		}
+		//IMSI
+		if length < idx+uint16(imsiLength) {
+			return nil, fmt.Errorf("Unmarshal  codecInfo.IMSI unqualified length: %d,idx: %d,IMSILength:%d ", length, idx, imsiLength)
+		}
+		c.IMSI = string(data[idx : idx+uint16(imsiLength)])
+		idx += uint16(imsiLength)
+	}
+	if imeiPres {
+		//IMEILength
+		if length < idx+1 {
+			return nil, fmt.Errorf("Unmarshal  codecInfo.IMEILength unqualified length: %d,idx: %d", length, idx)
+		}
+		imeiLength := data[idx]
+		idx++
+
+		if imeiLength == 0 {
+			return nil, errors.New("Unmarshal codecInfo.IMEI  unqualified length ")
+		}
+		//IMEI
+		if length < idx+uint16(imeiLength) {
+			return nil, fmt.Errorf("Unmarshal  codecInfo.IMEI unqualified length: %d,idx: %d,IMEILength:%d ", length, idx, imeiLength)
+		}
+		c.IMEI = string(data[idx : idx+uint16(imeiLength)])
+		idx += uint16(imeiLength)
+	}
+	if msisdnPres {
+		//MSISDNLength
+		if length < idx+1 {
+			return nil, fmt.Errorf("Unmarshal  codecInfo.MSISDNLength unqualified length: %d,idx: %d", length, idx)
+		}
+		msisdnLength := data[idx]
+		idx++
+
+		if msisdnLength == 0 {
+			return nil, errors.New("Unmarshal codecInfo.MSISDN  unqualified length ")
+		}
+		//MSISDN
+		if length < idx+uint16(msisdnLength) {
+			return nil, fmt.Errorf("Unmarshal  codecInfo.MSISDN unqualified length: %d,idx: %d,MSISDNLength:%d ", length, idx, msisdnLength)
+		}
+		c.MSISDN = string(data[idx : idx+uint16(msisdnLength)])
+		idx += uint16(msisdnLength)
+	}
+	//UEIP
+	if ueIp {
+		//UEIPLength
+		if length < idx+1 {
+			return nil, fmt.Errorf("Unmarshal  codecInfo.UEIPLength unqualified length: %d,idx: %d", length, idx)
+		}
+		ueipLength := data[idx]
+		idx++
+
+		if ueipLength == 0 {
+			return nil, errors.New("Unmarshal codecInfo.UEIP  unqualified length ")
+		}
+		if length < idx+uint16(ueipLength) {
+			return nil, fmt.Errorf("Unmarshal  codecInfo.UEIP unqualified length: %d,idx: %d", length, idx)
+		}
+		c.UEIP = string(data[idx : idx+uint16(ueipLength)])
+		idx += uint16(ueipLength)
+	}
+
+	//methodLength
+	if length < idx+1 {
+		return nil, fmt.Errorf("Unmarshal  codecInfo.MSISDNLength unqualified length: %d,idx: %d", length, idx)
+	}
+	methodLen := data[idx]
+	idx++
+	if length < idx+uint16(methodLen) {
+		return nil, fmt.Errorf("Unmarshal  codecInfo.Method unqualified length: %d,idx: %d,MSISDNLength:%d ", length, idx, methodLen)
+	}
+	//Method
+	c.Method = string(data[idx : idx+uint16(methodLen)])
+	idx += uint16(methodLen)
+	//msgLength
+	if length < idx+2 {
+		return nil, fmt.Errorf("Unmarshal  Message.BodyLength unqualified length: %d,idx: %d ", length, idx)
+	}
+
+	msgLength := binary.BigEndian.Uint16(data[idx : idx+2])
+	idx += 2
+	//raw proto message
+	if uint16(len(data[idx:])) != msgLength {
+		return nil, fmt.Errorf("Unmarshal  Message.PcapPacket unqualified length: %d,idx: %d,BodyLength:%d ", length, idx, msgLength)
+	}
+	return data[idx:], nil
+}

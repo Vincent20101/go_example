@@ -10,6 +10,9 @@ import (
 )
 
 func main() {
+
+	fmt.Println(85456 & 65536)
+	fmt.Println(69072 & 65536)
 	var m map[string]int
 	tm := map[string]int{"a": 1, "b": 2, "c": 3}
 	m = tm

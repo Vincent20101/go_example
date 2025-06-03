@@ -2,12 +2,13 @@ package main
 
 import (
 	"context"
-	"coolcar/car/mq/amqpclt"
-	coolenvpb "coolcar/shared/coolenv"
-	"coolcar/shared/server"
 	"encoding/json"
 	"fmt"
 	"time"
+
+	"coolcar/car/mq/amqpclt"
+	coolenvpb "coolcar/shared/coolenv"
+	"coolcar/shared/server"
 
 	"github.com/streadway/amqp"
 	"google.golang.org/grpc"

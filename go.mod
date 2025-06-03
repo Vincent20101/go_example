@@ -1,8 +1,8 @@
 module github.com/vincent20101/go-example
 
-go 1.23.0
+go 1.22.0
 
-toolchain go1.23.6
+toolchain go1.22.5
 
 require (
 	github.com/DeanThompson/ginpprof v0.0.0-20201112072838-007b1e56b2e1

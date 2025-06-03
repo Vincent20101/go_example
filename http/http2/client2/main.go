@@ -6,6 +6,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"net/http/httptrace"
 
 	"golang.org/x/net/http2"
 )
@@ -26,6 +27,17 @@ func main() {
 		return
 	}
 	req.Header.Set("Ping", "HelloServer")
+	// 定义ClientTrace钩子，在获取连接时触发
+	trace := &httptrace.ClientTrace{
+		GotConn: func(connInfo httptrace.GotConnInfo) {
+			localAddr := connInfo.Conn.LocalAddr().String()
+			remoteAddr := connInfo.Conn.RemoteAddr().String()
+			fmt.Println("===================")
+			fmt.Printf("本地地址 (源IP): %s\n", localAddr)
+			fmt.Printf("远程地址 (目标IP): %s\n", remoteAddr)
+		},
+	}
+	req.WithContext(httptrace.WithClientTrace(req.Context(), trace))
 	resp, err := client.Do(req)
 	if err != nil {
 		fmt.Println("Error making the request:", err)
