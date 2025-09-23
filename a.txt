@@ -22,7 +22,6 @@ https://github.com/cnych/pogo.git
  5951  git subtree status --prefix=go-interview
  5952  git subtree --prefix=go-interview
  5954  git subtree --help
- 5958  git subtree add --prefix=learn.go https://github.com/armstrongli/learn.go.git master
  5959  git subtree add --prefix=learn.go https://github.com/armstrongli/learn.go.git main
  5961  git subtree add --prefix=go-learning https://github.com/cnych/go-learning.git master
  5968  git subtree add --prefix=go-daily-lib https://github.com/darjun/go-daily-lib.git master
@@ -32,6 +31,9 @@ https://github.com/cnych/pogo.git
  5992  git subtree add --prefix=pogo https://github.com/cnych/pogo.git master
  5993  git subtree add --prefix=gostudy https://github.com/pingguoxueyuan/gostudy.git master
 
+
+git subtree pull --prefix=learn.go https://github.com/armstrongli/learn.go.git main
+git subtree pull --prefix=go-design-pattern https://github.com/mohuishou/go-design-pattern.git master
 
 
 # go-interview/demo/4-6/workspace/note.txt
