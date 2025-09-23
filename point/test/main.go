@@ -16,14 +16,16 @@ func main() {
 	var a int64
 	fmt.Println(&a)
 	ptr := &a
-	fmt.Println(ptr)
+	fmt.Println("ptr",ptr)
+	fmt.Println("&ptr",&ptr)
+
 	pptr := &ptr
-	fmt.Println(pptr)
+	fmt.Println("pptr",pptr)
 	ppptr := &pptr
-	fmt.Println(ppptr)
+	fmt.Println("ppptr",ppptr)
 	a = 1
-	fmt.Println(**ppptr)
-	fmt.Println(***ppptr)
+	fmt.Println("**ppptr",**ppptr)
+	fmt.Println("***ppptr",***ppptr)
 
 	atomic.AddInt64(&a, 1)
 	fmt.Println(**ppptr)

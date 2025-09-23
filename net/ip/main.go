@@ -15,7 +15,9 @@ func main() {
 	//str := "1030::C9B4:FF12:48AA:1A2B"
 	str := "192.168.0.1"
 	ip := net.ParseIP(str)
+	fmt.Println(ip[0],ip[11])
 	fmt.Println(ip.String())
+	fmt.Println(len(ip) == net.IPv6len)
 	fmt.Println([]byte(ip))
 	//fmt.Println(ip[8:].String())
 	//toString := hex.EncodeToString(ip[8:])
@@ -46,6 +48,12 @@ func main() {
 	fmt.Println("lhb===", net.ParseIP("127.0.0.1:8088"))
 	fmt.Println(net.SplitHostPort("[::1]:33960"))
 
+	// v6 := "2001:cafe:42:98:33c6:60a0:1386:3185"
+	v4 := "10.43.45.219"
+
+	ips := net.ParseIP(v4)
+	fmt.Println(ips.To4())
+	fmt.Println(ips.To16())
 }
 
 // ############## IPV6 ######################
@@ -58,7 +66,7 @@ func NetIpv6ToInt(ip net.IP) (*big.Int, error) {
 	return IPv6Int, nil
 }
 
-//NumToIPv6 converts a big integer represented by a string into an IPv6 address string
+// NumToIPv6 converts a big integer represented by a string into an IPv6 address string
 func NumToIPv6(numasstr string) (string, error) {
 	bi, ok := new(big.Int).SetString(numasstr, 10)
 	if !ok {

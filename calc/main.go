@@ -11,6 +11,7 @@ import (
 
 func main() {
 
+	fmt.Println()
 	fmt.Println(85456 & 65536)
 	fmt.Println(69072 & 65536)
 	var m map[string]int

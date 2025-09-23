@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"crypto/tls"
 	"fmt"
 	"log"
@@ -22,15 +23,19 @@ func main() {
 		fmt.Println(r.ProtoMinor)
 		//time.Sleep(time.Second * 100)
 		w.Header().Set("Content-Type", "text/plain")
-		w.WriteHeader(http.StatusOK)
+		// w.WriteHeader(http.StatusOK)
+		// fmt.Fprintf(w, "Hello, HTTP/2 Cleartext!")
 		//w.Write([]byte("Hello, HTTP/2.0 h2c!"))
-		fmt.Fprintf(w, "Hello, HTTP/2 Cleartext!")
+
+		w.WriteHeader(http.StatusNoContent)
+		fmt.Println("lhb:", bytes.NewBuffer(nil).String())
+		w.Write(bytes.NewBuffer(nil).Bytes())
 	})
 
 	h2s := &http2.Server{}
 
 	server := &http.Server{
-		Addr: ":8080",
+		Addr: ":8090",
 		//Handler:      h2cHandler(handler, h2s),
 		Handler:      h2cHandler(handler, h2s),
 		TLSNextProto: make(map[string]func(*http.Server, *tls.Conn, http.Handler)),

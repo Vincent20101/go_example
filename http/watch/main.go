@@ -2,10 +2,9 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strconv"
-	"time"
 )
 
 func main() {
@@ -41,7 +40,7 @@ func main() {
 		}
 
 		// 获取HTTP长链接的内容
-		body, err := ioutil.ReadAll(r.Body)
+		body, err := io.ReadAll(r.Body)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
@@ -49,3 +48,5 @@ func main() {
 
 		// 将HTTP长链接的内容转换为字符串并返回
 		fmt.Fprintln(w, string(body))
+	}
+}

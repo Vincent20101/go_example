@@ -3,15 +3,15 @@ package main
 import "fmt"
 
 func main() {
-	//fmt.Println(f(2))
-	//f1()
-	//f2()
-	//f3()
-	//f4()
+	fmt.Println(f(2))
+	// f1()
+	// f2()
+	// f3()
+	// f4()
 	//f5()
 	//f6()
 	//f7()
-	f8()
+	// f8()
 }
 
 type number int

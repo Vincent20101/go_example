@@ -26,7 +26,7 @@ func main() {
 		},
 	}
 
-	request, err := http.NewRequest("GET", "http://172.0.3.64", nil)
+	request, err := http.NewRequest("GET", "http://172.0.3.65:8090", nil)
 	//request.Host = "localhost:8082"
 	//request.URL.Host = "localhost:8080"
 	fmt.Println("request.Host:", request.Host)
@@ -42,6 +42,7 @@ func main() {
 	defer response.Body.Close()
 
 	fmt.Println("Response Status:", response.Status)
+	fmt.Println("Response body:", response.Body)
 
 	// 读取响应内容
 	buf := make([]byte, 1024)

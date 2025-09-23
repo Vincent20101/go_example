@@ -1,0 +1,97 @@
+package common
+
+import (
+	"net"
+
+	"github.com/google/gopacket/layers"
+	slog "gitlab.axyomcore.internal/mobility/smf/infra/base/logger"
+	"gitlab.axyomcore.internal/mobility/smf/infra/base/pcap/common/udppcaket"
+	"gitlab.axyomcore.internal/mobility/smf/infra/base/pcap/packet"
+
+	"github.com/davecgh/go-spew/spew"
+)
+
+// assemble message packet which will be sent to pcap sidecar in udp message
+func encodePacketWithUDPHeader(lc *slog.LogContext, imsi, imei, msisdn string, pcapNanoTs uint64, pcapPkt []byte) ([]byte, error) {
+	lc.LogDbg("===encodePacketWithUDPHeader")
+	dp := udppcaket.NewDataPacket(udppcaket.DefaultMessageType)
+	msg := &udppcaket.Message{
+		NanosecondTimestamp: pcapNanoTs,
+		IMSI:                imsi,
+		IMEI:                imei,
+		MSISDN:              msisdn,
+		PcapPacket:          pcapPkt,
+	}
+	data, err := dp.MarshalBinary(msg)
+	if err != nil {
+		lc.LogError("encode pcap packet failed: %v", err)
+		return nil, err
+	}
+	return data, nil
+}
+
+func WritePcapToSidecar(lc *slog.LogContext, imsi, imei, msisdn string, pcapNanoTs uint64, pcapPkt []byte) {
+	lc.LogDbg("===WritePcapToSidecar")
+
+	data, err := encodePacketWithUDPHeader(lc, imsi, imei, msisdn, pcapNanoTs, pcapPkt)
+	if err != nil {
+		lc.LogError("assemble udp packet failed: [err: %v]", err)
+		return
+	}
+
+	if slog.GetUdpConn() != nil {
+		if _, err = slog.GetUdpConn().Write(data); err != nil {
+			lc.LogError("WriteToUDP failed: [err: %s] [data: %s]", err.Error(), spew.Sdump(data))
+			return
+		}
+	}
+
+}
+
+type ProtocolType uint
+
+const (
+	UDP ProtocolType = iota + 1
+	TCP
+)
+
+func Options(localIP, remoteIP net.IP, localPort, remotePort uint16, protocolType ProtocolType) []packet.Option {
+	opts := make([]packet.Option, 0)
+	localIPv4 := localIP.To4()
+	localIPv6 := localIP.To16()
+	remoteIPv4 := remoteIP.To4()
+	remoteIPv6 := remoteIP.To16()
+
+	if localIPv4 != nil { // IPv4 address
+		opts = append(opts, packet.WithSrcIP(localIPv4))
+		if remoteIPv4 != nil {
+			opts = append(opts, packet.WithDstIP(remoteIPv4))
+		}
+	} else if localIPv6 != nil { // IPv6 address
+		opts = append(opts, packet.WithSrcIP(localIPv6), packet.WithL3Protocol(layers.IPProtocolIPv6))
+		if remoteIPv6 != nil {
+			opts = append(opts, packet.WithDstIP(remoteIPv6))
+		} else {
+			opts = append(opts, packet.WithDstIP(packet.DefaultIPv6))
+		}
+	}
+
+	if protocolType == TCP {
+		if localPort != 0 {
+			opts = append(opts, packet.WithTCPSrcPort(localPort))
+		}
+		if remotePort != 0 {
+			opts = append(opts, packet.WithTCPDstPort(remotePort))
+		}
+	} else if protocolType == UDP {
+		opts = append(opts, packet.WithL4Protocol(layers.IPProtocolUDP))
+		if localPort != 0 {
+			opts = append(opts, packet.WithUDPSrcPort(localPort))
+		}
+		if remotePort != 0 {
+			opts = append(opts, packet.WithUDPDstPort(remotePort))
+		}
+	}
+
+	return opts
+}

@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	image := "registry.gitlab.casa-systems.com/platform/operators/axyom-sidecar:v0.10.1"
+	image := "registry.gitlab.axyomcore.internal/platform/operators/axyom-sidecar:v0.10.1"
 	parts := strings.Split(image, ":")
 	fmt.Println(parts)
 

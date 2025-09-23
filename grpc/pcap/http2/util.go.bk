@@ -1,0 +1,299 @@
+package pcap_http2
+
+import (
+	"bytes"
+	"context"
+	"io"
+	"net"
+	"net/http"
+	"net/url"
+	"strconv"
+	"strings"
+	"time"
+
+	"github.com/getlantern/deepcopy"
+
+	slog "gitlab.axyomcore.internal/mobility/smf/infra/base/logger"
+	"gitlab.axyomcore.internal/mobility/smf/infra/base/pcap/packet"
+
+	"github.com/google/gopacket/layers"
+)
+
+const (
+	SBA_HEADER_PATH            string = ":path"
+	SBA_HEADER_AUTHORITY       string = ":authority"
+	SBA_HEADER_SCHEME          string = ":scheme"
+	SBA_HEADER_METHOD          string = ":method"
+	SBA_HEADER_STATUS          string = ":status"
+	SBA_HEADER_CONTENT_LENGTH  string = "content-length"
+	SBA_HEADER_ACCEPT_ENCODING string = "accept-encoding"
+)
+
+type Request struct {
+	Header        http.Header
+	Host          string
+	URL           *url.URL
+	Method        string
+	ContentLength int64
+	Body          []byte
+}
+
+// RequestClone clone http.Request, avoid concurrency causing panic
+func RequestClone(r *http.Request) *Request {
+	if r == nil {
+		return nil
+	}
+	req := &Request{
+		Header:        r.Header.Clone(),
+		Host:          r.Host,
+		Method:        r.Method,
+		ContentLength: r.ContentLength,
+	}
+	req.URL = new(url.URL)
+	deepcopy.Copy(req.URL, r.URL)
+
+	req.Body = nil
+	var err error
+	if r.Body != nil {
+		if req.Body, err = io.ReadAll(r.Body); err == nil {
+			r.Body = io.NopCloser(bytes.NewBuffer(req.Body))
+		}
+	}
+	return req
+}
+
+// RequestPcapTrace pcap trace http request and send to the sidecar
+func RequestPcapTrace(ctx context.Context, r *Request, nanoSecondTimestamp uint64) {
+	if v, ok := ctx.Value(slog.PcapCtxKey{}).(slog.PcapCtxValue); ok && r != nil {
+		// pcap packet need to add some http headers
+		r.Header.Set(SBA_HEADER_AUTHORITY, r.Host)
+		r.Header.Set(SBA_HEADER_PATH, r.URL.RequestURI())
+		r.Header.Set(SBA_HEADER_SCHEME, "http")
+		r.Header.Set(SBA_HEADER_METHOD, r.Method)
+		r.Header.Set(SBA_HEADER_CONTENT_LENGTH, strconv.Itoa(int(r.ContentLength)))
+		r.Header.Set(SBA_HEADER_ACCEPT_ENCODING, "gzip")
+
+		hp := NewPacket(r.Header, r.Body, func() uint64 {
+			if nanoSecondTimestamp == 0 {
+				nanoSecondTimestamp = uint64(time.Now().UnixNano())
+			}
+			return nanoSecondTimestamp
+		})
+		var opts []packet.Option
+		if v.TrafficType == slog.HTTP_TRAFFIC_INBOUND {
+			opts = remoteToLocalOption(v)
+		} else if v.TrafficType == slog.HTTP_TRAFFIC_OUTBOUND {
+			opts = localToRemoteOption(v)
+		}
+		// write pcap packet to sidecar
+		hp.AssemblePcap(opts...).WritePcapToSidecar(v.Lc)
+	}
+}
+
+type Response struct {
+	Header     http.Header
+	StatusCode int
+	Body       []byte
+}
+
+// ResponseClone clone http.Response, avoid concurrency causing panic
+func ResponseClone(w *http.Response) *Response {
+	if w == nil {
+		return nil
+	}
+	rsp := &Response{
+		Header:     w.Header.Clone(),
+		StatusCode: w.StatusCode,
+	}
+	rsp.Body = nil
+	var err error
+	if w.Body != nil {
+		if rsp.Body, err = io.ReadAll(w.Body); err == nil {
+			w.Body = io.NopCloser(bytes.NewBuffer(rsp.Body))
+		}
+	}
+	return rsp
+}
+
+// ResponsePcapTrace pcap trace http response and send to the sidecar
+func ResponsePcapTrace(ctx context.Context, w *Response, nanoSecondTimestamp uint64) {
+	if v, ok := ctx.Value(slog.PcapCtxKey{}).(slog.PcapCtxValue); ok && w != nil {
+		// pcap packet need to add :status header in response
+		w.Header.Set(SBA_HEADER_STATUS, strconv.Itoa(w.StatusCode))
+		hp := NewPacket(w.Header, w.Body, func() uint64 {
+			if nanoSecondTimestamp == 0 {
+				nanoSecondTimestamp = uint64(time.Now().UnixNano())
+			}
+			return nanoSecondTimestamp
+		})
+		var opts []packet.Option
+		if v.TrafficType == slog.HTTP_TRAFFIC_INBOUND {
+			opts = localToRemoteOption(v)
+		} else if v.TrafficType == slog.HTTP_TRAFFIC_OUTBOUND {
+			opts = remoteToLocalOption(v)
+		}
+		// write pcap packet to sidecar
+		hp.AssemblePcap(opts...).WritePcapToSidecar(v.Lc)
+	}
+}
+
+func localToRemoteOption(v slog.PcapCtxValue) []packet.Option {
+	opts := make([]packet.Option, 0)
+	if v.RemoteIPv4 != nil { // IPv4 address
+		opts = append(opts, packet.WithDstIP(v.RemoteIPv4))
+		if v.LocalIPv4 != nil {
+			opts = append(opts, packet.WithSrcIP(v.LocalIPv4))
+		}
+	} else if v.RemoteIPv6 != nil { // IPv6 address
+		opts = append(opts, packet.WithDstIP(v.RemoteIPv6), packet.WithL3Protocol(layers.IPProtocolIPv6))
+		if v.LocalIPv6 != nil {
+			opts = append(opts, packet.WithSrcIP(v.LocalIPv6))
+		} else {
+			opts = append(opts, packet.WithSrcIP(packet.DefaultIPv6))
+		}
+	}
+	// remote port
+	if v.RemotePort != 0 {
+		opts = append(opts, packet.WithTCPDstPort(v.RemotePort))
+	}
+
+	// local port
+	if v.LocalPort != 0 {
+		opts = append(opts, packet.WithTCPSrcPort(v.LocalPort))
+	}
+	return opts
+}
+
+func remoteToLocalOption(v slog.PcapCtxValue) []packet.Option {
+	opts := make([]packet.Option, 0)
+	if v.RemoteIPv4 != nil { // IPv4 address
+		opts = append(opts, packet.WithSrcIP(v.RemoteIPv4))
+		if v.LocalIPv4 != nil {
+			opts = append(opts, packet.WithDstIP(v.LocalIPv4))
+		}
+	} else if v.RemoteIPv6 != nil { // IPv6 address
+		opts = append(opts, packet.WithSrcIP(v.RemoteIPv6), packet.WithL3Protocol(layers.IPProtocolIPv6))
+		if v.LocalIPv6 != nil {
+			opts = append(opts, packet.WithDstIP(v.LocalIPv6))
+		} else {
+			opts = append(opts, packet.WithDstIP(packet.DefaultIPv6))
+		}
+	}
+	if v.RemotePort != 0 {
+		opts = append(opts, packet.WithTCPSrcPort(v.RemotePort))
+	}
+	if v.LocalPort != 0 {
+		opts = append(opts, packet.WithTCPDstPort(v.LocalPort))
+	}
+	return opts
+}
+
+func IsNeedTrace(ctx context.Context) bool {
+	if v, ok := ctx.Value(slog.PcapCtxKey{}).(slog.PcapCtxValue); ok && v.Lc != nil && v.Lc.IsNeedPcapTrace() {
+		return true
+	}
+	return false
+}
+
+func NewCtxWithPcapValue(ctx context.Context) (context.Context, context.CancelFunc) {
+	newCtx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	if v, ok := ctx.Value(slog.PcapCtxKey{}).(slog.PcapCtxValue); ok && v.Lc != nil {
+
+		// new context with PcapCtxKey
+		newCtx = context.WithValue(ctx, slog.PcapCtxKey{}, slog.PcapCtxValue{
+			LocalIPv4:   v.LocalIPv4,
+			LocalIPv6:   v.LocalIPv6,
+			LocalPort:   v.LocalPort,
+			RemoteIPv4:  v.RemoteIPv4,
+			RemoteIPv6:  v.RemoteIPv6,
+			RemotePort:  v.RemotePort,
+			TrafficType: v.TrafficType,
+			Lc:          v.Lc.Copy(),
+		})
+	}
+	return newCtx, cancel
+}
+
+func ParseHost(hostPort string) (ipv4, ipv6 net.IP, port uint16) {
+	if hostStr, portStr, err := net.SplitHostPort(hostPort); err == nil {
+		v4, v6 := FqdnToIP(hostStr)
+		if v4 != nil {
+			ipv4 = v4
+		} else if v6 != nil {
+			ipv6 = v6
+		} else {
+			ipv4 = net.ParseIP("127.0.0.1")
+		}
+		if p, err := strconv.Atoi(portStr); err == nil {
+			port = uint16(p)
+		}
+	}
+	return
+}
+
+func FqdnToIP(fqdn string) (v4, v6 net.IP) {
+	addrs, err := net.LookupIP(fqdn)
+	if err != nil {
+		return
+	}
+	var ipv4, ipv6 net.IP
+	for _, addr := range addrs {
+		if len(v4) != 0 && len(v6) != 0 {
+			break
+		}
+		if ipv4 = addr.To4(); ipv4 != nil {
+			v4 = ipv4
+		} else if ipv6 = addr.To16(); ipv6 != nil {
+			v6 = ipv6
+		}
+	}
+	return
+}
+
+func RemoteIp(req *http.Request) (remoteIp, remotePort string) {
+	remoteIp = req.RemoteAddr
+
+	if ip := req.Header.Get("X-Real-IP"); ip != "" {
+		remoteIp = ip
+	} else if ips := req.Header.Get("X-Forwarded-For"); ips != "" {
+		for _, ip = range strings.Split(ips, ",") {
+			if net.ParseIP(ip) != nil {
+				remoteIp = ip
+				break
+			}
+		}
+	}
+	// get remote ip and port from req.RemoteAddr
+	if hostIP, hostPort, err := net.SplitHostPort(remoteIp); err == nil {
+		if remoteIp == "" {
+			remoteIp = hostIP
+		}
+		remotePort = hostPort
+	}
+
+	if remoteIp == "::1" || remoteIp == "" {
+		remoteIp = net.ParseIP("127.0.0.1").String()
+	}
+	return
+}
+
+func ParseRemoteIP(req *http.Request) (ipv4, ipv6 net.IP, port string) {
+	ipStr, remotePort := RemoteIp(req)
+	if IsIPv4(ipStr) {
+		ipv4 = net.ParseIP(ipStr)
+	} else if IsIPv6(ipStr) {
+		ipv6 = net.ParseIP(ipStr)
+	}
+	port = remotePort
+	return
+}
+
+func IsIPv4(ipAddr string) bool {
+	ip := net.ParseIP(ipAddr)
+	return ip != nil && strings.Contains(ipAddr, ".")
+}
+
+func IsIPv6(ipAddr string) bool {
+	ip := net.ParseIP(ipAddr)
+	return ip != nil && strings.Contains(ipAddr, ":")
+}

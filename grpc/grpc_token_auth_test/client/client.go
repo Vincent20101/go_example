@@ -50,7 +50,7 @@ func main() {
 		defer conn.Close()
 
 		c := proto.NewGreeterClient(conn)
-		r, err := c.SayHello(context.Background(), &proto.HelloRequest{Name: "linhuanbo1"})
+		r, err := c.SayHello(context.Background(), &proto.HelloRequest{Name: "linhuanbo1", Age: 18})
 		if err != nil {
 			panic(err)
 		}

@@ -29,5 +29,5 @@ func main() {
 	s := strings.Split(supi, " ")
 	fmt.Println(s[0])
 	myFunction()
-	fmt.Println(path.Base("gitlab.casa-systems.com/mobility/smf/infra/protocol/gen/nnrf/disc.(*NFInstancesStoreApiService).SearchNFInstances"))
+	fmt.Println(path.Base("gitlab.axyomcore.internal/mobility/smf/infra/protocol/gen/nnrf/disc.(*NFInstancesStoreApiService).SearchNFInstances"))
 }
